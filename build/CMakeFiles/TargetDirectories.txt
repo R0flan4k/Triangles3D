@@ -1,0 +1,4 @@
+/home/roflan/roflan/Triangles3D/build/CMakeFiles/rebuild_cache.dir
+/home/roflan/roflan/Triangles3D/build/CMakeFiles/edit_cache.dir
+/home/roflan/roflan/Triangles3D/build/CMakeFiles/test.dir
+/home/roflan/roflan/Triangles3D/build/CMakeFiles/Triangles.x.dir

@@ -1,0 +1,1 @@
+/usr/bin/g++-10  -O2 -std=c++20 -g   CMakeFiles/Triangles.x.dir/Triangles/src/Triangles.cpp.o CMakeFiles/Triangles.x.dir/Triangles/src/main.cpp.o  -o Triangles.x 
