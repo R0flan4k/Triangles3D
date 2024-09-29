@@ -14,21 +14,22 @@ set(CMAKE_CXX_FLAGS "-O2 -std=c++20")
 
 set(SRCS
 	${CMAKE_SOURCE_DIR}/Triangles/src/Triangles.cpp
-  ${CMAKE_SOURCE_DIR}/Triangles/src/main.cpp
+	${CMAKE_SOURCE_DIR}/Triangles/src/main.cpp
 )
 add_executable(Triangles.x)
 
 target_sources(Triangles.x PRIVATE ${SRCS})
 target_include_directories(Triangles.x PUBLIC "${CMAKE_SOURCE_DIR}/Triangles/include")
 
-enable_testing()
-set(TESTS "${CMAKE_SOURCE_DIR}/Tests")
+add_subdirectory(${CMAKE_SOURCE_DIR}/tests)
 
-file(GLOB testfiles "${TESTS}/*.dat")
-foreach(file ${testfiles})
-  add_test(
-    NAME ${file}
-    COMMAND bash -c "${CMAKE_SOURCE_DIR}/runtest.sh ${file} ./Triangles.x"
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-set_tests_properties(${file} PROPERTIES DEPENDS Triangles.x)
-endforeach()
+# set(TESTS "${CMAKE_SOURCE_DIR}/Tests")
+# 
+# file(GLOB testfiles "${TESTS}/*.dat")
+# foreach(file ${testfiles})
+#   add_test(
+#     NAME ${file}
+#     COMMAND bash -c "${CMAKE_SOURCE_DIR}/runtest.sh ${file} ./Triangles.x"
+#     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+# set_tests_properties(${file} PROPERTIES DEPENDS Triangles.x)
+# endforeach()
