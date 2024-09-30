@@ -1,11 +1,6 @@
 # rm -rf build
-# cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-10
+# cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-10 -DCMAKE_BUILD_TYPE=Release
 # cmake --build ./build
-
-# To run LFU cache tests:
-# cmake --build ./build --target test ARGS="-C LFUTest"
-# To run perfect cache tests:
-# cmake --build ./build --target test ARGS="-C PerfectTest"
 
 cmake_minimum_required(VERSION 3.11)
 project(Triangles3D)
@@ -23,13 +18,3 @@ target_include_directories(Triangles.x PUBLIC "${CMAKE_SOURCE_DIR}/Triangles/inc
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/tests)
 
-# set(TESTS "${CMAKE_SOURCE_DIR}/Tests")
-# 
-# file(GLOB testfiles "${TESTS}/*.dat")
-# foreach(file ${testfiles})
-#   add_test(
-#     NAME ${file}
-#     COMMAND bash -c "${CMAKE_SOURCE_DIR}/runtest.sh ${file} ./Triangles.x"
-#     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-# set_tests_properties(${file} PROPERTIES DEPENDS Triangles.x)
-# endforeach()
