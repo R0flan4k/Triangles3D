@@ -73,6 +73,9 @@ bool Stereometry::are_collinear_vect(const point_t &p1, const point_t &p2)
     return (p1 * p2) == point_t{0, 0, 0};
 }
 
+Stereometry::plane_t::plane_t(float aa, float bb, float cc, float dd)
+: a(aa), b(bb), c(cc), d(dd) {}
+
 Stereometry::plane_t::plane_t(const point_t &p1, const point_t &p2,
                               const point_t &p3)
 {
@@ -85,8 +88,9 @@ Stereometry::plane_t::plane_t(const point_t &p1, const point_t &p2,
     }
     
     point_t v1 = {p2.x - p1.x, p2.y - p1.y, p2.z - p1.z}; // Vectors that on
-    point_t v2 = {p2.x - p1.x, p2.y - p1.y, p2.z - p1.z}; // the plane.
+    point_t v2 = {p3.x - p2.x, p3.y - p2.y, p3.z - p2.z}; // the plane.
     point_t n = v1 * v2; // Plane normal vector. n = [v1, v2]
+    // std::cout << n.x << " " << n.y << " " << n.z << std::endl; //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     a = n.x;
     b = n.y;

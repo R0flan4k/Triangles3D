@@ -28,7 +28,7 @@ bool are_collinear_vect(const point_t &p1, const point_t &p2);
 struct plane_t {
     float a, b, c, d; // Plane equation:
                        // ax + by + cz + d = 0.
-    plane_t() {}
+    plane_t(float a, float b, float c, float d);
     plane_t(const point_t &p1, const point_t &p2,
             const point_t &p3);
     bool valid() const;
@@ -40,7 +40,6 @@ struct plane_t {
 struct line_t {     //                _   _    _
     point_t r0, a;  // Line equation: r = r0 + at.
 
-    line_t() {}
     line_t(const plane_t &pln1, const plane_t &pln2);
     line_t(const std::pair<point_t, point_t> &p);
     bool valid() const;
@@ -60,7 +59,6 @@ public:
     const line_t& line() const {return l_;}
     const std::pair<float, float> ends() const {return ends_;}
 
-    interval_t() {}
     interval_t(const std::pair<point_t, point_t> &ends);
     interval_t(const line_t &l, const std::pair<float, float> ends);
     bool valid() const;
