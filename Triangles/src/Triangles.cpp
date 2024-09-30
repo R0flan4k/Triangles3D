@@ -64,10 +64,7 @@ bool Stereometry::are_on_line(const point_t &p1, const point_t &p2,
                               const point_t &p3)
 {
     assert(p1.valid() && p2.valid() && p3.valid());
-
-    return (p1 == p2 || p2 == p3) ||
-           ((p3.x - p2.x) / (p2.x - p1.x) == (p3.y - p2.y) / (p2.y - p1.y) &&
-            (p3.y - p2.y) / (p2.y - p1.y) == (p3.z - p2.z) / (p2.z - p1.z));
+    return are_collinear_vect(p2 - p1, p3 - p2);
 }
 
 bool Stereometry::are_collinear_vect(const point_t &p1, const point_t &p2)
