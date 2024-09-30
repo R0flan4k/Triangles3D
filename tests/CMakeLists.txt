@@ -4,11 +4,11 @@ project(Triangles3DTests)
 
 find_package(GTest REQUIRED)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 
 include_directories(
-    ../include
+    ../Triangles/include
     ${GTEST_INCLUDE_DIRS}
 )
 

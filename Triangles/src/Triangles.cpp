@@ -6,10 +6,9 @@
 #include <functional>
 #include <iostream>
 
-const size_t POLYGON_POINTS_NUM = 3;
-
 using DblCmp::are_eq;
 using DblCmp::are_geq;
+using DblCmp::is_zero;
 
 bool Stereometry::point_t::valid() const
 {
@@ -36,10 +35,10 @@ float Stereometry::operator/(const point_t &lhs, const point_t &rhs)
 {
     assert(lhs.valid() && rhs.valid());
     assert(are_collinear_vect(lhs, rhs));
-    if (are_eq(rhs.x, 0.0f))
+    if (is_zero(rhs.x))
     {
-        if (are_eq(rhs.y, 0.0f))
-            return are_eq(rhs.z, 0.0f) ? NAN : lhs.z / rhs.z;
+        if (is_zero(rhs.y))
+            return is_zero(rhs.z) ? NAN : lhs.z / rhs.z;
         return lhs.y / rhs.y;
     }
     return lhs.x / rhs.x;
@@ -114,9 +113,9 @@ bool Stereometry::plane_t::subset_check(const point_t &p) const
 std::pair<bool, bool> Stereometry::plane_t::is_parallel_equal(const plane_t &pln) const
 {
     return {
-        (are_eq(a, 0.0f) ? are_eq(pln.a, 0.0f) : are_eq(pln.b, (pln.a / a) * b)) &&
-        (are_eq(b, 0.0f) ? are_eq(pln.b, 0.0f) : are_eq(pln.c, (pln.b / b) * c)),
-        (are_eq(c, 0.0f) ? are_eq(pln.c, 0.0f) : are_eq(pln.d, (pln.c / c) * d))
+        (is_zero(a) ? is_zero(pln.a) : are_eq(pln.b, (pln.a / a) * b)) &&
+        (is_zero(b) ? is_zero(pln.b) : are_eq(pln.c, (pln.b / b) * c)),
+        (is_zero(c) ? is_zero(pln.c) : are_eq(pln.d, (pln.c / c) * d))
     }; // First variable is parallelism, second is equality.
 }
 
