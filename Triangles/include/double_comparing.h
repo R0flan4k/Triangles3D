@@ -14,11 +14,11 @@ bool is_zero(T num)
 template <typename T> 
 bool are_eq(T num1, T num2)
 {
-    T diff = num1 - num2;
+    float diff = std::abs(num1 - num2);
     num1 = std::abs(num1);
     num2 = std::abs(num2);
     float max = num1 > num2 ? num1 : num2;
-    return std::abs(num1 - num2) < max * std::numeric_limits<T>::epsilon();
+    return diff < (max + 1) * std::numeric_limits<T>::epsilon(); // +1 for num1 == num2 == 0 case.
 }
 
 template <typename T>

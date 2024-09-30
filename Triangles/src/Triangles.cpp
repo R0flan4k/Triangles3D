@@ -61,7 +61,7 @@ Stereometry::point_t Stereometry::operator+(const point_t &lhs, const point_t &r
 }
 
 bool Stereometry::are_on_line(const point_t &p1, const point_t &p2,
-                 const point_t &p3)
+                              const point_t &p3)
 {
     assert(p1.valid() && p2.valid() && p3.valid());
 
