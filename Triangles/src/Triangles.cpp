@@ -374,10 +374,8 @@ bool Stereometry::triangle_t::is_intersect_degenerate(const triangle_t &trgle) c
         else if (trgle_ival_p.first)
             return is_intersect(trgle.max_edge());
     }
-    else
-        return trgle.is_intersect_degenerate(*this);
-
-    assert(0 && "UNREACHABLE");
+    // Else
+    return trgle.is_intersect_degenerate(*this);
 }
 
 bool Stereometry::triangle_t::is_intersect_valid(const triangle_t &trgle) const
