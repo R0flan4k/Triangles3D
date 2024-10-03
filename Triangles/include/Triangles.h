@@ -14,10 +14,12 @@ struct point_t {
     float x = NAN, y = NAN, z = NAN;
 
     bool valid() const;
+    float get_len() const;
 };
  
 bool operator==(const point_t &lhs, const point_t &rhs);
 point_t operator*(const point_t &lhs, const point_t &rhs);
+point_t operator*(const float coeff, const point_t &vect);
 float operator/(const point_t &lhs, const point_t &rhs);
 point_t operator-(const point_t &lhs, const point_t &rhs);
 point_t operator+(const point_t &lhs, const point_t &rhs);
@@ -47,6 +49,7 @@ struct line_t {     //                _   _    _
     bool is_in(const plane_t &pln) const;
     bool subset_check(const point_t &p) const;
     bool is_intersect(const line_t &line) const;
+    float get_distance(const point_t &line) const;
     float get_point_coeff(const point_t &p) const;
     float get_intersection(const line_t &line) const;
 };
@@ -62,6 +65,8 @@ public:
     interval_t(const std::pair<point_t, point_t> &ends);
     interval_t(const line_t &l, const std::pair<float, float> ends);
     bool valid() const;
+    bool subset_check(const point_t &p) const;
+    float get_len() const;
     float get_intersection(const line_t &line) const;
     bool is_intersect(const interval_t &ival) const;
     bool is_intersect_inline(const interval_t &ival) const;
@@ -75,12 +80,30 @@ class triangle_t {
 public:
     const plane_t& plane() const {return pln_;}
     const std::vector<interval_t>& edges() const {return edges_;}
+    const interval_t& max_edge() const;
     
     triangle_t(const point_t &p1, const point_t &p2, const point_t &p3);
     bool valid() const;
     std::pair<float, float> get_intersection_interval(const line_t &line) const;
     bool is_intersect(const triangle_t &trgle) const;
     bool is_intersect_inplane(const triangle_t &trgle) const;
+    bool is_intersect(const interval_t &ival) const;
+    bool subset_check(const point_t &p) const;
+
+private:
+    bool is_intersect_degenerate(const triangle_t &trgle) const;
+    bool is_intersect_valid(const triangle_t &trgle) const;
+    bool is_special_interval() const;
+    bool is_special_point() const;
 };
+
+// class cube_t {
+//     std::pair<point_t, point_t> angles_;
+
+// public:
+//     cube_t(std::pair<point_t, point_t> &angles);
+//     bool valid() const;
+//     bool is_intersect(const cube_t &cube) const;
+// };
 
 } // namespace Triangles3D
