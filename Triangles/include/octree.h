@@ -18,7 +18,7 @@ class octree_node_t {
     float half_size_;
 
 public:
-    const octree_node_t& parent() const {return *parent_;}
+    const octree_node_t* parent() const {return parent_;}
     const std::vector<const triangle_t*>& data() const {return data_;}
     const triangle_t* data_elem(size_t id) const
     {
@@ -40,6 +40,7 @@ public:
         if (p.x > center_.x) res |= 4;
         if (p.y > center_.y) res |= 2;
         if (p.z > center_.z) res |= 1;
+        return res;
     }
 
     const octree_node_t& insert_trgle(const triangle_t &trgle)

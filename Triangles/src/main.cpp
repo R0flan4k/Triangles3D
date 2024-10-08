@@ -54,7 +54,7 @@ static size_t octree_calculate_intersections(VectT &trgles, size_t trgls_num)
     for (size_t i = 0; i < trgls_num; i++)
     {
         for (const octree_node_t * cur_node = &(trgles[i].octree_node);
-             cur_node != NULL; cur_node = cur_node->parent)
+             cur_node != NULL; cur_node = cur_node->parent())
         {
             if (node_check_intersection(trgles[i], *cur_node))
             {
@@ -63,6 +63,7 @@ static size_t octree_calculate_intersections(VectT &trgles, size_t trgls_num)
             }
         }
     }
+    return inters_cnt;
 }
 
 int main()
