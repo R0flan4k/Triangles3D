@@ -78,6 +78,9 @@ class triangle_t {
     std::vector<interval_t> edges_;
     
 public:
+    const point_t& p1() const {return p1_;}
+    const point_t& p2() const {return p2_;}
+    const point_t& p3() const {return p3_;}
     const plane_t& plane() const {return pln_;}
     const std::vector<interval_t>& edges() const {return edges_;}
     const interval_t& max_edge() const;
@@ -96,14 +99,5 @@ private:
     bool is_special_interval() const;
     bool is_special_point() const;
 };
-
-// class cube_t {
-//     std::pair<point_t, point_t> angles_;
-
-// public:
-//     cube_t(std::pair<point_t, point_t> &angles);
-//     bool valid() const;
-//     bool is_intersect(const cube_t &cube) const;
-// };
 
 } // namespace Triangles3D

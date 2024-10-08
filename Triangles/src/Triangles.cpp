@@ -403,9 +403,9 @@ bool Stereometry::triangle_t::is_intersect_inplane(const triangle_t &trgle) cons
     assert(valid() && trgle.valid());
     assert(pln_.is_parallel_equal(trgle.plane()).second);
     
-    for (auto edges_it1 = edges_.cbegin(); edges_it1 != edges_.cend();
-         ++edges_it1)
-        for (auto edges_it2 = trgle.edges_.cbegin(); edges_it2 != trgle.edges_.cend();
+    for (auto [edges_it1, edges_it2_start] = std::pair{edges_.cbegin(), trgle.edges_.cbegin()}; 
+         edges_it1 != edges_.cend(); ++edges_it1, ++edges_it2_start)
+        for (auto edges_it2 = edges_it2_start; edges_it2 != trgle.edges_.cend();
              ++edges_it2) 
             if (edges_it1->is_intersect(*edges_it2))
                 return true;
@@ -429,20 +429,6 @@ bool Stereometry::triangle_t::subset_check(const point_t &p) const
            are_geq(edges_[1].line().get_distance(p) * edges_[1].line().get_distance(p1_), 0.0f) &&
            are_geq(edges_[2].line().get_distance(p) * edges_[2].line().get_distance(p2_), 0.0f);
 }
-
-// Stereometry::cube_t::cube_t(std::pair<point_t, point_t> &angles)
-// : angles_(angles) {}
-
-// bool Stereometry::cube_t::valid() const
-// {
-//     return angles_.first.valid() && angles_.second.valid();
-// }
-
-// bool Stereometry::cube_t::is_intersect(const cube_t &cube) const
-// {
-//     assert(valid() && cube.valid());////////////////////////////////////
-//     return true;
-// }
 
 bool Stereometry::triangle_t::is_special_interval() const
 {

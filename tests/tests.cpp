@@ -100,6 +100,9 @@ TEST(Triangle, IsIntersect)
     EXPECT_TRUE(t1.is_intersect(t2));
     EXPECT_TRUE(t2.is_intersect(t3));
     EXPECT_TRUE(t1.is_intersect(t3));
+    EXPECT_TRUE(t1.is_intersect(t1));
+    EXPECT_TRUE(t2.is_intersect(t2));
+    EXPECT_TRUE(t3.is_intersect(t3));
 }
 
 TEST(Interval, SubsetCheck)
