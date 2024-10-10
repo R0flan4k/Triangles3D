@@ -2,18 +2,20 @@
 
 #include <cmath>
 #include <limits>
+#include <iostream>
 
 namespace DblCmp{
 
 template <typename T>
 bool is_zero(T num)
 {
-    return std::abs(num) < std::numeric_limits<T>::epsilon();
+    return std::abs(num) < 100 * std::numeric_limits<T>::epsilon();
 }
 
 template <typename T> 
 bool are_eq(T num1, T num2)
 {
+    std::cout << "T1 = " << num1 << ", T2 = " << num2 << std::endl;
     float diff = std::abs(num1 - num2);
     num1 = std::abs(num1);
     num2 = std::abs(num2);

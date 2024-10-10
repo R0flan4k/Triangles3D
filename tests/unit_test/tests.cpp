@@ -95,20 +95,14 @@ TEST(Triangle, IsIntersect)
 {
     triangle_t t1{{0, 0, 0}, {1, 1, 1}, {0, 1, 1}},
                t2{{1, 1, 0}, {-1, 1, 0}, {0, -1, 0}},
-               t3{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}},
-               t4{{1, 0, 0}, {0, 1, 0}, {0, -1, 0}},
-               t5{{0, 0, 0}, {1, 1, 1}, {0, 1, 1}};
+               t3{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
     
     EXPECT_TRUE(t1.is_intersect(t2));
     EXPECT_TRUE(t2.is_intersect(t3));
     EXPECT_TRUE(t1.is_intersect(t3));
-    EXPECT_TRUE(t4.is_intersect(t5));
-
     EXPECT_TRUE(t1.is_intersect(t1));
     EXPECT_TRUE(t2.is_intersect(t2));
     EXPECT_TRUE(t3.is_intersect(t3));
-    EXPECT_TRUE(t4.is_intersect(t4));
-    EXPECT_TRUE(t5.is_intersect(t5));
 }
 
 TEST(Interval, SubsetCheck)

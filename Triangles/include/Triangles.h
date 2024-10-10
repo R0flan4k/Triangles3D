@@ -15,12 +15,14 @@ struct point_t {
 
     bool valid() const;
     float get_len() const;
+    void dump() const;
 };
  
 bool operator==(const point_t &lhs, const point_t &rhs);
 point_t operator*(const point_t &lhs, const point_t &rhs);
 point_t operator*(const float coeff, const point_t &vect);
 float operator/(const point_t &lhs, const point_t &rhs);
+point_t operator/(const point_t &lhs, const float coeff);
 point_t operator-(const point_t &lhs, const point_t &rhs);
 point_t operator+(const point_t &lhs, const point_t &rhs);
 bool are_on_line(const point_t &p1, const point_t &p2,

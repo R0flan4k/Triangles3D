@@ -6,6 +6,7 @@
 #include <functional>
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 
 using DblCmp::are_eq;
 using DblCmp::are_geq;
@@ -13,12 +14,18 @@ using DblCmp::is_zero;
 
 bool Stereometry::point_t::valid() const
 {
+    // std::cout << "in point valid " << x << " " << y << " " << z << std::endl;
     return (x == x) && (y == y) && (z == z);
 }
 
 float Stereometry::point_t::get_len() const
 {
     return std::sqrt(x * x + y * y + z * z);
+}
+
+void Stereometry::point_t::dump() const
+{
+    std::cout << x << ", " << y << ", " << z << "." << std::endl;
 }
 
 bool Stereometry::operator==(const point_t &lhs, const point_t &rhs)
@@ -43,6 +50,12 @@ Stereometry::point_t Stereometry::operator*(const point_t &lhs, const point_t &r
     return {lhs.y * rhs.z - lhs.z * rhs.y,     
             lhs.z * rhs.x - lhs.x * rhs.z, 
             lhs.x * rhs.y - lhs.y * rhs.x};
+}
+
+Stereometry::point_t Stereometry::operator/(const point_t &lhs, const float coeff)
+{
+    assert(lhs.valid());
+    return {lhs.x / coeff, lhs.y / coeff, lhs.z / coeff};
 }
 
 float Stereometry::operator/(const point_t &lhs, const point_t &rhs)
@@ -104,6 +117,7 @@ Stereometry::plane_t::plane_t(const point_t &p1, const point_t &p2,
     point_t v1 = {p2.x - p1.x, p2.y - p1.y, p2.z - p1.z}; // Vectors that on
     point_t v2 = {p3.x - p2.x, p3.y - p2.y, p3.z - p2.z}; // the plane.
     point_t n = v1 * v2; // Plane normal vector. n = [v1, v2]
+    n = n / n.get_len();
 
     a = n.x;
     b = n.y;
@@ -120,8 +134,8 @@ bool Stereometry::plane_t::valid() const
 bool Stereometry::plane_t::subset_check(const point_t &p) const
 {
     assert(p.valid());
-
-    return p.x * a + p.y * b + p.z * c + d == 0;
+    std::cout << "ETO R000\n";
+    return is_zero(p.x * a + p.y * b + p.z * c + d);
 }
 
 std::pair<bool, bool> Stereometry::plane_t::is_parallel_equal(const plane_t &pln) const
@@ -137,8 +151,8 @@ Stereometry::point_t Stereometry::plane_t::get_common_point(const plane_t &pln) 
 {
     assert(valid() && pln.valid());
 
-    Matrix::matrix2d_t<float> system_matr{b, pln.c,
-                                          pln.b, c};
+    Matrix::matrix2d_t<float> system_matr{b, c,
+                                          pln.b, pln.c};
     std::pair<float, float> solve;
     float x;
     if (a == 0)
@@ -150,14 +164,14 @@ Stereometry::point_t Stereometry::plane_t::get_common_point(const plane_t &pln) 
         }
         else
         {
-            x = pln.d / pln.a;
-            solve = system_matr.calculate_linear({a * x - d, 0});
+            x = - pln.d / pln.a;
+            solve = system_matr.calculate_linear({- a * x - d, 0});
         }
     }
     else
     {
-        x = d / a;
-        solve = system_matr.calculate_linear({0, pln.a * x - pln.d});
+        x = - d / a;
+        solve = system_matr.calculate_linear({0, - pln.a * x - pln.d});
     }
     return {x, solve.first, solve.second};
 }
@@ -169,6 +183,7 @@ Stereometry::line_t::line_t(const plane_t &pln1, const plane_t &pln2)
     point_t n1 = {pln1.a, pln1.b, pln1.c},
             n2 = {pln2.a, pln2.b, pln2.c};
     a = n1 * n2;
+    a = a / a.get_len();
     r0 = pln1.get_common_point(pln2);
 }
 
@@ -187,7 +202,8 @@ bool Stereometry::line_t::valid() const
 
 bool Stereometry::line_t::is_parallel(const plane_t &pln) const
 {
-    return a.x * pln.a + a.y * pln.b + a.z * pln.c == 0;
+    std::cout << "ETO AA\n";
+    return is_zero(a.x * pln.a + a.y * pln.b + a.z * pln.c);
 }
 
 bool Stereometry::line_t::is_in(const plane_t &pln) const
@@ -292,6 +308,17 @@ bool Stereometry::interval_t::is_intersect(const interval_t &ival) const
 
 bool Stereometry::interval_t::is_intersect_inline(const interval_t &ival) const
 {
+    if (!valid() || !ival.valid())
+    {
+        std::cout << "***IVAL1***\n\tend1: " << ends_.first << "\n\tend2: " << ends_.second << "\n\tr0: ";
+        l_.r0.dump();
+        std::cout << "\ta: ";
+        l_.a.dump();
+        std::cout << "***IVAL2***\n\tend1: " << ival.ends_.first << "\n\tend2: " << ival.ends_.second << "\n\tr0: ";
+        ival.l_.r0.dump();
+        std::cout << "\ta: ";
+        ival.l_.a.dump();
+    }
     assert(valid() && ival.valid());
     assert(are_collinear_vect(ival.l_.a, l_.a) &&
            are_collinear_vect(l_.a, ival.l_.r0 - l_.r0));
@@ -313,6 +340,7 @@ Stereometry::triangle_t::triangle_t(const point_t &p1, const point_t &p2, const 
 
 bool Stereometry::triangle_t::valid() const
 {
+    // std::cout << "In trgle valid\n";
     return p1_.valid() && p2_.valid() && p3_.valid() &&
            pln_.valid() &&
            edges_[0].valid() && edges_[1].valid() && edges_[2].valid();
@@ -334,6 +362,14 @@ const Stereometry::interval_t& Stereometry::triangle_t::max_edge() const
 std::pair<float, float> Stereometry::triangle_t::get_intersection_interval(const line_t &line) const
 {
     assert(line.valid());
+    if (!line.is_in(pln_))
+    {
+        std::cout << "***LINE***\n\tr0: ";
+        line.r0.dump();
+        std::cout << "\ta: ";
+        line.a.dump();
+        std::cout << "***PLANE***\n\ta = " << pln_.a << ", " << "b = " << pln_.b << ", " << "c = " << pln_.c << ", " << "d = " << pln_.d << std::endl;
+    }
     assert(line.is_in(pln_));
 
     float inter1 = edges_[0].get_intersection(line),
@@ -346,6 +382,7 @@ std::pair<float, float> Stereometry::triangle_t::get_intersection_interval(const
 
 bool Stereometry::triangle_t::is_intersect(const triangle_t &trgle) const
 {
+    // std::cout << "In is intersect\n";
     if (is_special_interval() || trgle.is_special_interval())
         return is_intersect_degenerate(trgle);
     return is_intersect_valid(trgle);
@@ -380,7 +417,9 @@ bool Stereometry::triangle_t::is_intersect_degenerate(const triangle_t &trgle) c
 
 bool Stereometry::triangle_t::is_intersect_valid(const triangle_t &trgle) const
 {
+    // std::cout << "In is intersect valid\n";
     assert(valid() && trgle.valid());
+    // std::cout << "Vishel iz validov valid\n";
 
     std::pair<bool, bool> is_parallel_eq = pln_.is_parallel_equal(trgle.plane());
     if (is_parallel_eq.first)
@@ -390,6 +429,7 @@ bool Stereometry::triangle_t::is_intersect_valid(const triangle_t &trgle) const
         return false;
     }
 
+    // std::cout << "Aboba1" << std::endl;
     line_t plns_intersection{pln_, trgle.plane()};
     std::pair<float, float> intersection_ival1 = get_intersection_interval(plns_intersection),
                             intersection_ival2 = trgle.get_intersection_interval(plns_intersection);
