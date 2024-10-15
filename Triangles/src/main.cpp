@@ -24,23 +24,22 @@ int main()
         return 1;
     }
 
-    std::vector<triangle_unit_t> trgles;
+    // We mustn't reallocate triangle units container because
+    // octree nodes contains pointers to triangles inside node.
+    std::vector<triangle_unit_t> trgles{n}; 
     octree_node_t octree{point_t{0, 0, 0},                         // Central point.
                          std::numeric_limits<float>::max() * 0.5f, // Half size.
                          NULL};                                    // Parent node (NULL cause it is base node).
-    // std::cout << "Vhod v input\n";
     if (TrglesIntersections::get_triangles_input(trgles, n, octree, 
                                                  std::istream_iterator<float>(std::cin),
                                                  std::istream_iterator<float>())) 
         return 1;
-    // std::cout << "Vhod v calc\n";
     for (size_t i = 0; i < trgles.size(); i++)
     {
         assert(trgles[i].octree_node);
         trgles[i].octree_node->dump();
     }
     size_t intersect_count = TrglesIntersections::octree_calculate_intersections(trgles, n);
-    // std::cout << "Vihod iz calc\n";
     std::cout << intersect_count << std::endl;
     return 0;
 }

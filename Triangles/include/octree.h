@@ -25,7 +25,7 @@ public:
     const std::vector<const triangle_t*>& data() const {return data_;}
 
     octree_node_t(point_t center, float half_size, octree_node_t * parent)
-    : center_(center), half_size_(half_size)
+    : parent_(parent), center_(center), half_size_(half_size)
     {
         for (size_t i = 0; i < 8; i++)
             children_[i] = NULL;
@@ -34,10 +34,7 @@ public:
     ~octree_node_t()
     {
         for (size_t i = 0; i < 8; i++)
-        {
-            if (children_[i])
-                delete children_[i];
-        }
+            delete children_[i];
     }
 
     int get_position(const point_t &p) const
@@ -57,7 +54,7 @@ public:
             p3_child = get_position(trgle.p3());
         
         // Check if the triangle placed in child node.
-        if (p1_child == p2_child == p3_child)
+        if (p1_child == p2_child && p2_child == p3_child)
         {
             if (children_[p1_child] == NULL)
             {
@@ -72,6 +69,11 @@ public:
         }
         
         data_.push_back(&trgle);
+#if 0
+        std::cout << "_____________________Pushed_Trgle________________________\n";
+        data_[data_.size() - 1]->dump();
+        std::cout << "_________________________________________________________\n";
+#endif
         return this;
     }
 
@@ -86,8 +88,8 @@ public:
         for (size_t i = 0; i < vect_size; i++)
         {
             std::cout << "\t[" << i << "]:" << std::endl;
-            std::cout << "\t\t" << data_[i]->p1().x << ", " << data_[i]->p1().y << ", " << data_[i]->p1().z << std::endl;
-            std::cout << "\t\t" << data_[i]->p2().x << ", " << data_[i]->p2().y << ", " << data_[i]->p2().z << std::endl;
+            std::cout << "\t\t" << static_cast<float> (data_[i]->p1().x) << ", " << data_[i]->p1().y << ", " << data_[i]->p1().z << std::endl;
+            std::cout << "\t\t" << static_cast<float> (data_[i]->p2().x) << ", " << data_[i]->p2().y << ", " << data_[i]->p2().z << std::endl;
             std::cout << "\t\t" << data_[i]->p3().x << ", " << data_[i]->p3().y << ", " << data_[i]->p3().z << std::endl;
         }
         std::cout << "===========================================" << std::endl;

@@ -7,20 +7,22 @@
 namespace DblCmp{
 
 template <typename T>
+const T tolerance =  1000 * std::numeric_limits<T>::epsilon();
+
+template <typename T>
 bool is_zero(T num)
 {
-    return std::abs(num) < 100 * std::numeric_limits<T>::epsilon();
+    return std::abs(num) < tolerance<T>;
 }
 
 template <typename T> 
 bool are_eq(T num1, T num2)
 {
-    std::cout << "T1 = " << num1 << ", T2 = " << num2 << std::endl;
     float diff = std::abs(num1 - num2);
     num1 = std::abs(num1);
     num2 = std::abs(num2);
     float max = num1 > num2 ? num1 : num2;
-    return diff < (max + 1) * std::numeric_limits<T>::epsilon(); // +1 for num1 == num2 == 0 case.
+    return diff < (max + 1) * tolerance<T>; // +1 for num1 == num2 == 0 case.
 }
 
 template <typename T>

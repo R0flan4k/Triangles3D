@@ -32,10 +32,12 @@ bool are_collinear_vect(const point_t &p1, const point_t &p2);
 struct plane_t {
     float a, b, c, d; // Plane equation:
                        // ax + by + cz + d = 0.
+    plane_t() {}
     plane_t(float a, float b, float c, float d);
     plane_t(const point_t &p1, const point_t &p2,
             const point_t &p3);
     bool valid() const;
+    void dump() const;
     bool subset_check(const point_t &p) const;
     std::pair<bool, bool> is_parallel_equal(const plane_t &pln) const;
     point_t get_common_point(const plane_t &pln) const;
@@ -47,6 +49,7 @@ struct line_t {     //                _   _    _
     line_t(const plane_t &pln1, const plane_t &pln2);
     line_t(const std::pair<point_t, point_t> &p);
     bool valid() const;
+    void dump() const;
     bool is_parallel(const plane_t &pln) const;
     bool is_in(const plane_t &pln) const;
     bool subset_check(const point_t &p) const;
@@ -67,6 +70,7 @@ public:
     interval_t(const std::pair<point_t, point_t> &ends);
     interval_t(const line_t &l, const std::pair<float, float> ends);
     bool valid() const;
+    void dump() const;
     bool subset_check(const point_t &p) const;
     float get_len() const;
     float get_intersection(const line_t &line) const;
@@ -87,8 +91,10 @@ public:
     const std::vector<interval_t>& edges() const {return edges_;}
     const interval_t& max_edge() const;
     
+    triangle_t() {}
     triangle_t(const point_t &p1, const point_t &p2, const point_t &p3);
     bool valid() const;
+    void dump() const;
     std::pair<float, float> get_intersection_interval(const line_t &line) const;
     bool is_intersect(const triangle_t &trgle) const;
     bool is_intersect_inplane(const triangle_t &trgle) const;
