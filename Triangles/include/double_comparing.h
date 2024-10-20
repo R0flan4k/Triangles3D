@@ -7,7 +7,7 @@
 namespace DblCmp{
 
 template <typename T>
-const T tolerance =  1000 * std::numeric_limits<T>::epsilon();
+const T tolerance =  1e+3 * std::numeric_limits<T>::epsilon();
 
 template <typename T>
 bool is_zero(T num)
@@ -35,6 +35,12 @@ template <typename T>
 bool are_leq(T num1, T num2)
 {
     return are_eq(num1, num2) || num1 < num2;
+}
+
+template <typename T>
+bool abs_cmp(const T &a, const T &b)
+{
+    return std::abs(a) < std::abs(b);
 }
 
 }

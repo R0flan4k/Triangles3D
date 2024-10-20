@@ -32,7 +32,6 @@ bool are_collinear_vect(const point_t &p1, const point_t &p2);
 struct plane_t {
     float a, b, c, d; // Plane equation:
                        // ax + by + cz + d = 0.
-    plane_t() {}
     plane_t(float a, float b, float c, float d);
     plane_t(const point_t &p1, const point_t &p2,
             const point_t &p3);
@@ -91,7 +90,6 @@ public:
     const std::vector<interval_t>& edges() const {return edges_;}
     const interval_t& max_edge() const;
     
-    triangle_t() {}
     triangle_t(const point_t &p1, const point_t &p2, const point_t &p3);
     bool valid() const;
     void dump() const;

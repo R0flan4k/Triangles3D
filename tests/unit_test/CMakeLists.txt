@@ -7,6 +7,10 @@ find_package(GTest REQUIRED) # Not reliable, i'm going to replace it.
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 
+set(SRCS
+	${CMAKE_CURRENT_SOURCE_DIR}/test.cpp
+)
+
 include_directories(
 	${CMAKE_SOURCE_DIR}/Triangles/include
 	${GTEST_INCLUDE_DIRS}

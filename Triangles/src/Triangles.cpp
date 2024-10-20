@@ -231,10 +231,16 @@ bool Stereometry::line_t::subset_check(const point_t &p) const
 bool Stereometry::line_t::is_intersect(const line_t &line) const
 {
     assert(valid() && line.valid());
+
+    if (are_collinear_vect(a, line.a) && subset_check(line.r0))
+        return true;
+
     point_t v_mul = a * line.a;
-    v_mul = v_mul / v_mul.get_len();
     point_t diff = r0 - line.r0;
+#if 0
+    v_mul = v_mul / v_mul.get_len();
     diff = diff / diff.get_len();
+#endif
     return is_zero(v_mul.x * diff.x + v_mul.y * diff.y + v_mul.z * diff.z);
 }
 
@@ -368,28 +374,31 @@ const Stereometry::interval_t& Stereometry::triangle_t::max_edge() const
 std::pair<float, float> Stereometry::triangle_t::get_intersection_interval(const line_t &line) const
 {
     assert(line.valid());
-#if 0
-    if (!line.is_in(pln_))
-    {
-        std::cout << "***LINE***\n\tr0: ";
-        line.r0.dump();
-        std::cout << "\ta: ";
-        line.a.dump();
-        std::cout << "***PLANE***\n\ta = " << pln_.a << ", " << "b = " << pln_.b << ", " << "c = " << pln_.c << ", " << "d = " << pln_.d << std::endl;
-    }
-#endif
-    assert(line.is_in(pln_));
+
+    if (!line.is_in(pln_)) return {NAN, NAN};
 
     float inter1 = edges_[0].get_intersection(line),
           inter2 = edges_[1].get_intersection(line),
           inter3 = edges_[2].get_intersection(line);
-#if 0
-    std::cout << "***IN GET INTERSECTION IVAL***\n";
-    std::cout << "\t" << inter1 << "\n\t" << inter2 << "\n\t" << inter3 << std::endl;
-#endif
-    if (inter1 != inter1) return {inter2, inter3};
-    if (inter2 != inter2) return {inter1, inter3};
-    return {inter1, inter2};
+
+    if (std::isnan(inter1)) 
+    {
+        if (std::isnan(inter2))
+            return {inter3, inter3};
+        else if (std::isnan(inter3))
+            return {inter2, inter2};
+        else
+            return {inter2, inter3};
+    }
+    else if (std::isnan(inter2)) 
+    {
+        if (std::isnan(inter3))
+            return {inter1, inter1};
+        else 
+            return {inter1, inter3};
+    }
+    else
+        return {inter1, inter2};
 }
 
 bool Stereometry::triangle_t::is_intersect(const triangle_t &trgle) const
@@ -441,8 +450,8 @@ bool Stereometry::triangle_t::is_intersect_valid(const triangle_t &trgle) const
     line_t plns_intersection{pln_, trgle.plane()};
     std::pair<float, float> intersection_ival1 = get_intersection_interval(plns_intersection),
                             intersection_ival2 = trgle.get_intersection_interval(plns_intersection);
-    if ((intersection_ival1.first != intersection_ival1.first && intersection_ival1.second != intersection_ival1.second) ||
-        (intersection_ival2.first != intersection_ival2.first && intersection_ival2.second != intersection_ival2.second))
+    if ((std::isnan(intersection_ival1.first) && std::isnan(intersection_ival1.second)) ||
+        (std::isnan(intersection_ival2.first) && std::isnan(intersection_ival2.second)))
         return false;
     interval_t ival1{plns_intersection, intersection_ival1},
                ival2{plns_intersection, intersection_ival2};

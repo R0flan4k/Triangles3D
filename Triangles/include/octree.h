@@ -3,7 +3,7 @@
 #include "Triangles.h"
 #include "double_comparing.h"
 
-#include <vector>
+#include <list>
 #include <cassert>
 #include <iostream>
 
@@ -13,20 +13,30 @@ using Stereometry::triangle_t;
 using Stereometry::point_t;
 using DblCmp::are_geq;
 
+template <typename DataT>
 class octree_node_t {      
     octree_node_t * parent_;       
     octree_node_t * children_[8];
-    std::vector<const triangle_t*> data_; // IDs of triangles in this node.
+    std::list<DataT*> data_; 
     point_t center_;
     float half_size_;
 
 public:
-    const octree_node_t* parent() const {return parent_;}
-    const std::vector<const triangle_t*>& data() const {return data_;}
+    octree_node_t* parent() const {return parent_;}
+    std::list<DataT*>& data() {return data_;}
 
     octree_node_t(point_t center, float half_size, octree_node_t * parent)
     : parent_(parent), center_(center), half_size_(half_size)
     {
+        for (size_t i = 0; i < 8; i++)
+            children_[i] = NULL;
+    }
+
+    octree_node_t(point_t center)
+    : center_(center)
+    {
+        parent_ = NULL;
+        half_size_ = NAN;
         for (size_t i = 0; i < 8; i++)
             children_[i] = NULL;
     }
@@ -47,11 +57,11 @@ public:
         return res;
     }
 
-    const octree_node_t* insert_trgle(const triangle_t &trgle)
+    octree_node_t* insert_trgle(DataT *trgle)
     {
-        int p1_child = get_position(trgle.p1()),
-            p2_child = get_position(trgle.p2()), 
-            p3_child = get_position(trgle.p3());
+        int p1_child = get_position(trgle->p1()),
+            p2_child = get_position(trgle->p2()), 
+            p3_child = get_position(trgle->p3());
         
         // Check if the triangle placed in child node.
         if (p1_child == p2_child && p2_child == p3_child)
@@ -68,12 +78,7 @@ public:
             return children_[p1_child]->insert_trgle(trgle);
         }
         
-        data_.push_back(&trgle);
-#if 0
-        std::cout << "_____________________Pushed_Trgle________________________\n";
-        data_[data_.size() - 1]->dump();
-        std::cout << "_________________________________________________________\n";
-#endif
+        data_.push_back(trgle);
         return this;
     }
 
@@ -84,13 +89,22 @@ public:
         std::cout << "Center: \t" << center_.x << ", " << center_.y << ", " << center_.z << std::endl;
         std::cout << "Half size: \t" << half_size_ << std::endl;
         std::cout << "Triangles:" << std::endl;
-        size_t vect_size = data_.size();
-        for (size_t i = 0; i < vect_size; i++)
+        size_t i = 0;
+        for (auto start = data_.cbegin(), end = data_.cend(); start != end; ++start, ++i)
         {
             std::cout << "\t[" << i << "]:" << std::endl;
-            std::cout << "\t\t" << static_cast<float> (data_[i]->p1().x) << ", " << data_[i]->p1().y << ", " << data_[i]->p1().z << std::endl;
-            std::cout << "\t\t" << static_cast<float> (data_[i]->p2().x) << ", " << data_[i]->p2().y << ", " << data_[i]->p2().z << std::endl;
-            std::cout << "\t\t" << data_[i]->p3().x << ", " << data_[i]->p3().y << ", " << data_[i]->p3().z << std::endl;
+            std::cout << "\t\t" << (*start)->p1().x << ", " << (*start)->p1().y << ", " << (*start)->p1().z << std::endl;
+            std::cout << "\t\t" << (*start)->p2().x << ", " << (*start)->p2().y << ", " << (*start)->p2().z << std::endl;
+            std::cout << "\t\t" << (*start)->p3().x << ", " << (*start)->p3().y << ", " << (*start)->p3().z << std::endl;
+            std::cout << "\tIs intersect:\t" << (*start)->is_intersect << std::endl;
+        }
+        for (size_t i = 0; i < 8; ++i)
+        {
+            if (children_[i])
+            {
+                std::cout << "\nChild[" << i << "]:\n";
+                children_[i]->dump();
+            }
         }
         std::cout << "===========================================" << std::endl;
     }

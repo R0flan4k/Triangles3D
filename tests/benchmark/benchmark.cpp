@@ -30,7 +30,7 @@ static void BM_octree_trgles(benchmark::State &state)
     // Setup.
     size_t n = state.range(0);
     std::vector<float> input;
-    generate_input(n * 9, input);
+    generate_input(n, input);
 #if 0
     std::cout << "Input: \n";
     for (size_t i = 0; i < n * 9; i++) //
@@ -39,12 +39,15 @@ static void BM_octree_trgles(benchmark::State &state)
     }
     std::cout << std::endl;
 #endif
-    octree_node_t octree{point_t{-10, -10, -10},
-                         20.f,
-                         NULL};
-    std::vector<triangle_unit_t> trgles{n}; 
-    TrglesIntersections::get_triangles_input(trgles, n, octree,
-                                             input.cbegin(), input.cend());
+    // octree_node_t octree{point_t{-10, -10, -10},
+    //                      20.f,
+    //                      NULL};
+    // std::vector<triangle_unit_t> trgles; 
+    // trgles.reserve(n);
+    // TrglesIntersections::get_triangles_input(trgles, n, octree,
+    //                                          input.cbegin(), input.cend());
+    TrglesIntersections::octree_trgles_intersect_cntr_t ts{n, 20.f,
+                                                           input.cbegin(), input.cend()};
 #if 0
     trgles[0].trgle.dump();
     std::cout << "Input processed\n";
@@ -53,30 +56,27 @@ static void BM_octree_trgles(benchmark::State &state)
     // This code gets timed.
     for (auto _ : state)
     {
-        benchmark::DoNotOptimize(TrglesIntersections::octree_calculate_intersections(trgles, state.range(0)));
+        benchmark::DoNotOptimize(ts.calculate_intersections());
     }
 }
 
-static void DISABLED_BM_trivial_trgles(benchmark::State &state)
+static void BM_trivial_trgles(benchmark::State &state)
 {
     // Setup.
     size_t n = state.range(0);
     std::vector<float> input;
     generate_input(n, input);
     std::vector<triangle_t> trgles;
-#if 0
+
     for (size_t i = 0; i < n * 9; i += 9)
     {
         point_t p1 = {input[i + 0], input[i + 1], input[i + 2]},
                 p2 = {input[i + 3], input[i + 4], input[i + 5]},
                 p3 = {input[i + 6], input[i + 7], input[i + 8]};
-        std::cout << "[" << i / 9 << " trgle]:\n";
-        std::cout << "\t"; p1.dump();
-        std::cout << "\t"; p2.dump();
-        std::cout << "\t"; p3.dump();
-        trgles.push_back(triangle_t{p1, p2, p3});
+
+        trgles.emplace_back(p1, p2, p3);
     }
-#endif
+
 
     // This code gets timed.
     for (auto _ : state)
@@ -92,7 +92,7 @@ static void DISABLED_BM_trivial_trgles(benchmark::State &state)
     }
 }
 
-BENCHMARK(DISABLED_BM_trivial_trgles)->Arg(100);
-BENCHMARK(BM_octree_trgles)->Arg(2);
+BENCHMARK(BM_trivial_trgles)->Arg(100);
+BENCHMARK(BM_octree_trgles)->Arg(100);
 
 BENCHMARK_MAIN();
