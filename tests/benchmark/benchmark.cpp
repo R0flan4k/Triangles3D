@@ -31,27 +31,9 @@ static void BM_octree_trgles(benchmark::State &state)
     size_t n = state.range(0);
     std::vector<float> input;
     generate_input(n, input);
-#if 0
-    std::cout << "Input: \n";
-    for (size_t i = 0; i < n * 9; i++) //
-    {
-        std::cout << input[i] << " , ";
-    }
-    std::cout << std::endl;
-#endif
-    // octree_node_t octree{point_t{-10, -10, -10},
-    //                      20.f,
-    //                      NULL};
-    // std::vector<triangle_unit_t> trgles; 
-    // trgles.reserve(n);
-    // TrglesIntersections::get_triangles_input(trgles, n, octree,
-    //                                          input.cbegin(), input.cend());
+
     TrglesIntersections::octree_trgles_intersect_cntr_t ts{n, 20.f,
                                                            input.cbegin(), input.cend()};
-#if 0
-    trgles[0].trgle.dump();
-    std::cout << "Input processed\n";
-#endif
     
     // This code gets timed.
     for (auto _ : state)
@@ -83,12 +65,7 @@ static void BM_trivial_trgles(benchmark::State &state)
     {
         for (size_t i = 0; i < n; i++)
             for (size_t j = i + 1; j < n; j++)
-            {
-#if 0
-                std::cout << "[" << i <<"] and [" << j << "] trgles.\n";
-#endif
                 if (trgles[i].is_intersect(trgles[j])) break;
-            }
     }
 }
 

@@ -113,9 +113,13 @@ Stereometry::plane_t::plane_t(const point_t &p1, const point_t &p2,
         return;
     }
     
-    point_t v1 = {p2.x - p1.x, p2.y - p1.y, p2.z - p1.z}; // Vectors that on
-    point_t v2 = {p3.x - p2.x, p3.y - p2.y, p3.z - p2.z}; // the plane.
-    point_t n = v1 * v2; // Plane normal vector. n = [v1, v2]
+    // Vectors that on
+    // the plane.
+    point_t v1 = {p2.x - p1.x, p2.y - p1.y, p2.z - p1.z}; 
+    point_t v2 = {p3.x - p2.x, p3.y - p2.y, p3.z - p2.z}; 
+    // Plane normal vector. n = [v1, v2]
+    point_t n = v1 * v2; 
+    // Vector normalization for accurate calculations.
     n = n / n.get_len();
 
     a = n.x;
@@ -147,7 +151,7 @@ std::pair<bool, bool> Stereometry::plane_t::is_parallel_equal(const plane_t &pln
         (is_zero(a) ? is_zero(pln.a) : are_eq(pln.b, (pln.a / a) * b)) &&
         (is_zero(b) ? is_zero(pln.b) : are_eq(pln.c, (pln.b / b) * c)),
         (is_zero(c) ? is_zero(pln.c) : are_eq(pln.d, (pln.c / c) * d))
-    }; // First variable is parallelism, second is equality.
+    };
 }
 
 Stereometry::point_t Stereometry::plane_t::get_common_point(const plane_t &pln) const
@@ -181,6 +185,8 @@ Stereometry::point_t Stereometry::plane_t::get_common_point(const plane_t &pln) 
 
 Stereometry::line_t::line_t(const plane_t &pln1, const plane_t &pln2)
 {
+    //                        _     _
+    // If planes are parallel a and r0 remains invalid.
     if (pln1.is_parallel_equal(pln2).first) return;
 
     point_t n1 = {pln1.a, pln1.b, pln1.c},
@@ -192,6 +198,8 @@ Stereometry::line_t::line_t(const plane_t &pln1, const plane_t &pln2)
 
 Stereometry::line_t::line_t(const std::pair<point_t, point_t> &p)
 {
+    //                     _     _
+    // If points are equal a and r0 remains invalid.
     if (p.first == p.second) return;
 
     a = p.first - p.second;
@@ -232,9 +240,11 @@ bool Stereometry::line_t::is_intersect(const line_t &line) const
 {
     assert(valid() && line.valid());
 
+    // Check if that line and another line defines one line.
     if (are_collinear_vect(a, line.a) && subset_check(line.r0))
         return true;
-
+    //                           _   _    _     _
+    // Two lines intersects if ([a1, a2], r01 - r02) == 0.
     point_t v_mul = a * line.a;
     point_t diff = r0 - line.r0;
 #if 0
@@ -255,7 +265,7 @@ float Stereometry::line_t::get_point_coeff(const point_t &p) const
 {
     assert(valid() && p.valid());
     point_t diff = p - r0;
-    assert(are_collinear_vect(diff, a));
+    if (!are_collinear_vect(diff, a)) return NAN;
     return diff / a;
 }
 
@@ -265,10 +275,11 @@ float Stereometry::line_t::get_intersection(const line_t &line) const
     
     if (!is_intersect(line)) return NAN;
     Matrix::matrix2d_t<double> sys_matr{a.x, -line.a.x,
-                                       a.y, -line.a.y},
-                                matr1{line.r0.x - r0.x, -line.a.x,
-                                      line.r0.y - r0.y, -line.a.y};
-    return matr1.det() / sys_matr.det();  // Returns NAN if sys_matr.det() is 0.
+                                        a.y, -line.a.y},
+                                  matr1{line.r0.x - r0.x, -line.a.x,
+                                        line.r0.y - r0.y, -line.a.y};
+    // Returns NAN if sys_matr.det() is 0.
+    return matr1.det() / sys_matr.det();
 }
 
 Stereometry::interval_t::interval_t(const std::pair<point_t, point_t> &ends)
@@ -286,8 +297,8 @@ Stereometry::interval_t::interval_t(const line_t &l, const std::pair<float, floa
 bool Stereometry::interval_t::valid() const
 {
     return l_.valid() &&
-            (ends_.first == ends_.first) &&
-            (ends_.second == ends_.second);
+          (ends_.first == ends_.first) &&
+          (ends_.second == ends_.second);
 }
 
 void Stereometry::interval_t::dump() const
@@ -315,7 +326,8 @@ float Stereometry::interval_t::get_intersection(const line_t &line) const
 {
     assert(valid() && line.valid());
 
-    float ic = l_.get_intersection(line); // Coefficient of intersection point (intersection coefficient).
+    // Coefficient of intersection point (intersection coefficient).
+    float ic = l_.get_intersection(line);
     return are_geq((ic - ends_.first) * (ends_.second - ic), 0.0f) ?
            ic : NAN;
 }
@@ -324,8 +336,9 @@ bool Stereometry::interval_t::is_intersect(const interval_t &ival) const
 {
     if (!l_.is_intersect(ival.l_)) return false;
 
-    float ic1 = get_intersection(ival.l_),     // Coefficients of intersection point
-          ic2 = ival.get_intersection(l_);     // (intersection coefficient).
+    // Coefficients of intersection point (intersection coefficient).
+    float ic1 = get_intersection(ival.l_),     
+          ic2 = ival.get_intersection(l_); 
     return are_geq((ic1 - ends_.first) * (ends_.second - ic1), 0.0f) &&
            are_geq((ic2 - ival.ends_.first) * (ival.ends_.second - ic2), 0.0f);
 }
@@ -410,10 +423,12 @@ bool Stereometry::triangle_t::is_intersect(const triangle_t &trgle) const
 
 bool Stereometry::triangle_t::is_intersect_degenerate(const triangle_t &trgle) const
 {
-    std::pair<bool, bool> this_ival_p = {is_special_interval(),       // Check if these triangles
-                                         is_special_point()},         // are degenerate cases of triangle.
-                         trgle_ival_p = {trgle.is_special_interval(), // In another words if they are
-                                         trgle.is_special_point()};   // intervals or points.
+    // Check if these triangles are degenerate cases of triangle.
+    // In another words if they are intervals or points.
+    std::pair<bool, bool> this_ival_p = {is_special_interval(),       
+                                         is_special_point()},         
+                         trgle_ival_p = {trgle.is_special_interval(), 
+                                         trgle.is_special_point()};   
 
     if (this_ival_p.second)
     {
@@ -431,7 +446,7 @@ bool Stereometry::triangle_t::is_intersect_degenerate(const triangle_t &trgle) c
         else if (trgle_ival_p.first)
             return is_intersect(trgle.max_edge());
     }
-    // Else
+    // else
     return trgle.is_intersect_degenerate(*this);
 }
 
