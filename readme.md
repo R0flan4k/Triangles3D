@@ -19,7 +19,7 @@ conan profile detect --force
 
 Now you can build the project:
 ```
-conan install . --build=missing  
-cmake . -B build -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-cmake --build build
+conan install . --build=missing -s compiler.cppstd=gnu20
+cmake . -B build/Release -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+cmake --build build/Release
 ```
