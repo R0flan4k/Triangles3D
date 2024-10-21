@@ -23,7 +23,7 @@ class octree_node_t {
 
 public:
     octree_node_t* parent() const {return parent_;}
-    std::list<DataT*>& data() {return data_;}
+    const std::list<DataT*>& data() const {return data_;}
 
     octree_node_t(point_t center, float half_size, octree_node_t * parent)
     : parent_(parent), center_(center), half_size_(half_size)
@@ -80,6 +80,12 @@ public:
         
         data_.push_back(trgle);
         return this;
+    }
+
+    using ListIt = typename std::list<DataT*>::const_iterator;
+    void set_triangle_intersection(ListIt it)
+    {
+        (*it)->is_intersect = true;
     }
 
     void dump() const

@@ -69,7 +69,7 @@ public:
                 continue;
             }
 
-            for (NodeT *ocnode= start->ocnode;
+            for (NodeT *ocnode = start->ocnode;
                  ocnode != NULL;  ocnode = ocnode->parent())
             {
                 if (node_check_intersection(*start, *ocnode))
@@ -94,7 +94,10 @@ private:
                 continue;
 
             if (trgle.trgle.is_intersect((*start)->trgle))
-                return trgle.is_intersect = (*start)->is_intersect = true;
+            {
+                ocnode.set_triangle_intersection(start);
+                return trgle.is_intersect = true;
+            }
                 
         }
         return false;

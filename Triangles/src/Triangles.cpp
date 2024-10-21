@@ -24,7 +24,7 @@ float Stereometry::point_t::get_len() const
 
 void Stereometry::point_t::dump() const
 {
-    std::cout << x << ", " << y << ", " << z << "." << std::endl;
+    std::cout << x << ", " << y << ", " << z << '.' << std::endl;
 }
 
 bool Stereometry::operator==(const point_t &lhs, const point_t &rhs)
@@ -167,18 +167,18 @@ Stereometry::point_t Stereometry::plane_t::get_common_point(const plane_t &pln) 
         if (pln.a == 0)
         {   
             x = 0;
-            solve = system_matr.calculate_linear({d, pln.d});
+            solve = system_matr.calculate_linear(d, pln.d);
         }
         else
         {
             x = - pln.d / pln.a;
-            solve = system_matr.calculate_linear({- a * x - d, 0});
+            solve = system_matr.calculate_linear(- a * x - d, 0);
         }
     }
     else
     {
         x = - d / a;
-        solve = system_matr.calculate_linear({0, - pln.a * x - pln.d});
+        solve = system_matr.calculate_linear(0, - pln.a * x - pln.d);
     }
     return {x, solve.first, solve.second};
 }

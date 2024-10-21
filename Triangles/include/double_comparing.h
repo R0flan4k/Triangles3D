@@ -2,43 +2,47 @@
 
 #include <cmath>
 #include <limits>
-#include <iostream>
+#include <concepts>
+#include <type_traits>
 
 namespace DblCmp{
 
 template <typename T>
+concept floating_point = std::is_floating_point_v<T>;
+
+template <floating_point T>
 const T tolerance =  1e+3 * std::numeric_limits<T>::epsilon();
 
-template <typename T>
-bool is_zero(T num)
+template <floating_point T>
+bool is_zero(T num, T epsilon = tolerance<T>)
 {
-    return std::abs(num) < tolerance<T>;
+    return std::abs(num) < epsilon;
 }
 
-template <typename T> 
-bool are_eq(T num1, T num2)
+template <floating_point T> 
+bool are_eq(T num1, T num2, T epsilon = tolerance<T>)
 {
-    float diff = std::abs(num1 - num2);
+    T diff = std::abs(num1 - num2);
     num1 = std::abs(num1);
     num2 = std::abs(num2);
-    float max = num1 > num2 ? num1 : num2;
-    return diff < (max + 1) * tolerance<T>; // +1 for num1 == num2 == 0 case.
+    T max = num1 > num2 ? num1 : num2;
+    return diff < (max + 1) * epsilon; // +1 for num1 == num2 == 0 case.
 }
 
-template <typename T>
-bool are_geq(T num1, T num2)
+template <floating_point T>
+bool are_geq(T num1, T num2, T epsilon = tolerance<T>)
 {
-    return are_eq(num1, num2) || num1 > num2;
+    return are_eq(num1, num2, epsilon) || num1 > num2;
 }
 
-template <typename T>
-bool are_leq(T num1, T num2)
+template <floating_point T>
+bool are_leq(T num1, T num2, T epsilon = tolerance<T>)
 {
-    return are_eq(num1, num2) || num1 < num2;
+    return are_eq(num1, num2, epsilon) || num1 < num2;
 }
 
-template <typename T>
-bool abs_cmp(const T &a, const T &b)
+template <floating_point T>
+bool abs_cmp(T a, T b)
 {
     return std::abs(a) < std::abs(b);
 }
