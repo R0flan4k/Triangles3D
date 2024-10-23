@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.6)
 
 project(Triangles3DTests)
 
-find_package(GTest REQUIRED) # Not reliable, i'm going to replace it.
+find_package(GTest REQUIRED)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
