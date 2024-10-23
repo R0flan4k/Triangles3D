@@ -2,6 +2,12 @@
 Language:        Cpp
 BasedOnStyle:  LLVM
 
+AllowAllArgumentsOnNextLine: false
+AllowAllConstructorInitializersOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: false
+ColumnLimit:     80
+AccessModifierOffset: -4
+IndentWidth:     4
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterCaseLabel:  true
