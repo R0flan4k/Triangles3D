@@ -12,12 +12,13 @@ using Octree::octree_node_t;
 using TrglesIntersections::triangle_unit_t;
 
 template <typename VectT>
-void generate_input(size_t triangles_num, VectT &input)
+void generate_input(size_t triangles_num, VectT &input,
+                    float min_bound, float max_bound)
 {
     // Random float number generator.
     std::random_device dev;
     std::mt19937 rng(dev());
-    std::uniform_real_distribution dis(-10.f, 10.f);
+    std::uniform_real_distribution dis(min_bound, max_bound);
 
     for (size_t i = 0; i < triangles_num * 9; i++)
     {
@@ -30,7 +31,8 @@ static void BM_octree_trgles(benchmark::State &state)
     // Setup.
     size_t n = state.range(0);
     std::vector<float> input;
-    generate_input(n, input);
+    generate_input(n/2, input, -20.f, 0.f);
+    generate_input(n - n/2, input, 0.f, 20.f);
 
     TrglesIntersections::octree_trgles_intersect_cntr_t ts{n, 20.f,
                                                            input.cbegin(), input.cend()};
@@ -47,7 +49,7 @@ static void BM_trivial_trgles(benchmark::State &state)
     // Setup.
     size_t n = state.range(0);
     std::vector<float> input;
-    generate_input(n, input);
+    generate_input(n, input, -20.f, 20.f);
     std::vector<triangle_t> trgles;
 
     for (size_t i = 0; i < n * 9; i += 9)
@@ -62,10 +64,11 @@ static void BM_trivial_trgles(benchmark::State &state)
 
     // This code gets timed.
     for (auto _ : state)
-    {
+    {   
         for (size_t i = 0; i < n; i++)
             for (size_t j = i + 1; j < n; j++)
-                if (trgles[i].is_intersect(trgles[j])) break;
+                if (trgles[i].is_intersect(trgles[j])) 
+                    benchmark::DoNotOptimize(52);
     }
 }
 
