@@ -1,5 +1,8 @@
 #include "gtest/gtest.h"
 #include "Triangles.h"
+#include "intersections.h"
+
+#include <vector>
 
 using namespace Stereometry;
 
@@ -98,7 +101,9 @@ TEST(Triangle, IsIntersect)
                t3{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}},
                t4{{1, 0, 0}, {0, 1, 0}, {0, -1, 0}},
                t5{{0, 0, 0}, {1, 1, 1}, {0, 1, 1}},
-               t6{{0.5, 0.5, 0.5}, {1, 1, 1}, {0, 1, 1}};
+               t6{{0.5, 0.5, 0.5}, {1, 1, 1}, {0, 1, 1}},
+               t7{{0, 0, 0}, {1, 0, 0}, {0, 1, 0}},
+               t8{{0, 0.5, -0.5}, {0, 0.5, 0.5}, {-1, 0, 0}};
     
     EXPECT_FALSE(t6.is_intersect(t2));
     EXPECT_FALSE(t2.is_intersect(t6));
@@ -106,6 +111,8 @@ TEST(Triangle, IsIntersect)
     EXPECT_TRUE(t2.is_intersect(t3));
     EXPECT_TRUE(t1.is_intersect(t3));
     EXPECT_TRUE(t4.is_intersect(t5));
+    EXPECT_TRUE(t7.is_intersect(t8));
+    EXPECT_TRUE(t8.is_intersect(t7));
 
     EXPECT_TRUE(t1.is_intersect(t1));
     EXPECT_TRUE(t2.is_intersect(t2));
@@ -129,4 +136,22 @@ TEST(Triangle, SubsetCheck)
     triangle_t t1{{0, 0, 0}, {1, 1, 1}, {0, 1, 1}};
     
     EXPECT_TRUE(t1.subset_check(point_t{0, 0, 0}));
+}
+
+TEST(TrglesIntersections, OctreeIntersectionsCntr)
+{
+    std::vector<float> input {0, 0, 0, 1, 0, 0, 0, 1, 0,
+                              5, 5, 5, 5, 5, 5, 5, 5, 5,
+                              0, 0.5, -0.5, 0, 0.5, 0.5, -1, 0, 0};
+    TrglesIntersections::octree_trgles_intersect_cntr_t ts{3, 6, 
+                                                           input.cbegin(), input.cend()};
+    for (auto i : ts.data)
+    {
+        i.trgle.dump();
+    }
+    std::cout << "data size: " << ts.data.size() << std::endl;
+    std::cout << "data capacity: " << ts.data.capacity() << std::endl;
+    size_t inters = ts.calculate_intersections();
+
+    EXPECT_EQ(inters, 2);
 }

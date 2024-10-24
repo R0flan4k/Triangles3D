@@ -22,6 +22,8 @@ struct triangle_unit_t {
     const point_t& p1() const {return trgle.p1();}
     const point_t& p2() const {return trgle.p2();}
     const point_t& p3() const {return trgle.p3();}
+    bool is_special_point() const {return trgle.is_special_point();}
+    bool is_special_interval() const {return trgle.is_special_interval();}
 
     triangle_unit_t(const point_t &p1, const point_t &p2,
                     const point_t &p3, bool is_inter,
@@ -41,7 +43,7 @@ public:
                                    RandomIt first, const RandomIt last)
     : octree(point_t{0, 0, 0}, octree_half_size, NULL)
     {
-        data.reserve(n*9);
+        data.reserve(n);
 
         for (; first != last;)
         {

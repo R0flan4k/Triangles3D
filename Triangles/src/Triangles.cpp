@@ -119,8 +119,10 @@ Stereometry::plane_t::plane_t(const point_t &p1, const point_t &p2,
     point_t v2 = {p3.x - p2.x, p3.y - p2.y, p3.z - p2.z}; 
     // Plane normal vector. n = [v1, v2]
     point_t n = v1 * v2; 
+#if 0
     // Vector normalization for accurate calculations.
     n = n / n.get_len();
+#endif
 
     a = n.x;
     b = n.y;
@@ -192,7 +194,9 @@ Stereometry::line_t::line_t(const plane_t &pln1, const plane_t &pln2)
     point_t n1 = {pln1.a, pln1.b, pln1.c},
             n2 = {pln2.a, pln2.b, pln2.c};
     a = n1 * n2;
+#if 0
     a = a / a.get_len();
+#endif
     r0 = pln1.get_common_point(pln2);
 }
 
@@ -278,8 +282,15 @@ float Stereometry::line_t::get_intersection(const line_t &line) const
                                         a.y, -line.a.y},
                                   matr1{line.r0.x - r0.x, -line.a.x,
                                         line.r0.y - r0.y, -line.a.y};
-    // Returns NAN if sys_matr.det() is 0.
-    return matr1.det() / sys_matr.det();
+    
+    if (!is_zero(sys_matr.det())) return matr1.det() / sys_matr.det();
+
+    Matrix::matrix2d_t<double> alt_sys_matr{a.y, -line.a.y,
+                                            a.z, -line.a.z},
+                                  alt_matr1{line.r0.y - r0.y, -line.a.y,
+                                            line.r0.z - r0.z, -line.a.z};
+    // Returns NAN if sys_matr.det() and alt_sys_matr.det() are 0.
+    return alt_matr1.det() / alt_sys_matr.det();
 }
 
 Stereometry::interval_t::interval_t(const std::pair<point_t, point_t> &ends)

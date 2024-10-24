@@ -59,6 +59,14 @@ public:
 
     octree_node_t* insert_trgle(DataT *trgle)
     {
+        assert(trgle);
+
+        if (trgle->is_special_point())
+        {
+            data_.push_back(trgle);
+            return this;
+        }
+
         int p1_child = get_position(trgle->p1()),
             p2_child = get_position(trgle->p2()), 
             p3_child = get_position(trgle->p3());

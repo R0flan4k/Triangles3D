@@ -128,16 +128,16 @@ public:
     bool is_intersect(const interval_t &ival) const;
     bool subset_check(const point_t &p) const;
 
-private:
-    bool is_intersect_degenerate(const triangle_t &trgle) const;
-    bool is_intersect_valid(const triangle_t &trgle) const;
-
     // Check if the triangle is degenerated into a interval.
     // Includes degenerate point case.
     bool is_special_interval() const;
 
     // Check if the triangle is degenerated into a point.
     bool is_special_point() const;
+
+private:
+    bool is_intersect_degenerate(const triangle_t &trgle) const;
+    bool is_intersect_valid(const triangle_t &trgle) const;
 };
 
 } // namespace Triangles3D
