@@ -400,3 +400,5 @@ FodyWeavers.xsd
 build/
 build/*
 CMakeUserPresets.json
+.venv/
+.venv/*

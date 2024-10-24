@@ -12,7 +12,14 @@ git clone git@github.com:R0flan4k/Triangles3D.git
 cd Triangles3D
 ```
 
-If you have never used conan on your machine before, please run:
+Next download conan into virtual environments:
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip3 install -r requirements.txt
+```
+
+Detect conan profile:
 ```
 conan profile detect --force
 ```
