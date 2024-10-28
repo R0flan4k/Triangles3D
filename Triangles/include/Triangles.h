@@ -46,6 +46,10 @@ struct plane_t {
     // First pair value is parallelism, second is equality.
     std::pair<bool, bool> is_parallel_equal(const plane_t &pln) const;
     point_t get_common_point(const plane_t &pln) const;
+
+private:
+    point_t degenerate_get_common_point(const plane_t &pln) const;
+
 };
 
 struct line_t {

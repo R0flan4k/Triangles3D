@@ -145,12 +145,6 @@ TEST(TrglesIntersections, OctreeIntersectionsCntr)
                               0, 0.5, -0.5, 0, 0.5, 0.5, -1, 0, 0};
     TrglesIntersections::octree_trgles_intersect_cntr_t ts{3, 6, 
                                                            input.cbegin(), input.cend()};
-    for (auto i : ts.data)
-    {
-        i.trgle.dump();
-    }
-    std::cout << "data size: " << ts.data.size() << std::endl;
-    std::cout << "data capacity: " << ts.data.capacity() << std::endl;
     size_t inters = ts.calculate_intersections();
 
     EXPECT_EQ(inters, 2);

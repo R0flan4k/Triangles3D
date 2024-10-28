@@ -26,7 +26,7 @@ void generate_input(size_t triangles_num, VectT &input,
     }
 }
 
-static void BM_octree_trgles(benchmark::State &state)
+static void BM_random_octree_trgles(benchmark::State &state)
 {
     // Setup.
     size_t n = state.range(0);
@@ -44,7 +44,7 @@ static void BM_octree_trgles(benchmark::State &state)
     }
 }
 
-static void BM_trivial_trgles(benchmark::State &state)
+static void BM_random_trivial_trgles(benchmark::State &state)
 {
     // Setup.
     size_t n = state.range(0);
@@ -61,6 +61,50 @@ static void BM_trivial_trgles(benchmark::State &state)
         trgles.emplace_back(p1, p2, p3);
     }
 
+    // This code gets timed.
+    for (auto _ : state)
+    {   
+        for (size_t i = 0; i < n; i++)
+            for (size_t j = i + 1; j < n; j++)
+                if (trgles[i].is_intersect(trgles[j])) 
+                    benchmark::DoNotOptimize(52);
+    }
+}
+
+static void BM_octree_trgles1(benchmark::State &state)
+{
+    // Setup.
+    size_t n = 8;
+    std::vector<float> input{1, 1, 0, 3, 1, 0, 1, 3, 0,
+                             0, 0, 0, 1, 0, 0, 0, 1, 0,
+                             1, 0.5, 0, 1, 0.5, 1, 0, 0, 0.5,
+                             1, 0, 0, 0, 1, 0, 0, 0, 1,
+                             0, 0, 0, 0, 3, 3, 0, 0, 3,
+                             1, 1, 0, 1, 2, 3, 5, 4, 8,
+                             9, 9, 9, 9, 9, 9, 9, 9, 9,
+                             8, 8, 8, 8, 8, 8, -10, 8, 8};
+
+    TrglesIntersections::octree_trgles_intersect_cntr_t ts{8, 11,
+                                                           input.cbegin(), input.cend()};
+    // This code gets timed.
+    for (auto _ : state)
+    {
+        benchmark::DoNotOptimize(ts.calculate_intersections());
+    }
+}
+
+static void BM_trivial_trgles1(benchmark::State &state)
+{
+    // Setup.
+    size_t n = 8;
+    std::vector<triangle_t> trgles{triangle_t{{1, 1, 0}, {3, 1, 0}, {1, 3, 0}},
+                                   triangle_t{{0, 0, 0}, {1, 0, 0}, {0, 1, 0}},
+                                   triangle_t{{1, 0.5, 0}, {1, 0.5, 1}, {0, 0, 0.5}},
+                                   triangle_t{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}},
+                                   triangle_t{{0, 0, 0}, {0, 3, 3}, {0, 0, 3}},
+                                   triangle_t{{1, 1, 0}, {1, 2, 3}, {5, 4, 8}},
+                                   triangle_t{{9, 9, 9}, {9, 9, 9}, {9, 9, 9}},
+                                   triangle_t{{8, 8, 8}, {8, 8, 8}, {-10, 8, 8}}};
 
     // This code gets timed.
     for (auto _ : state)
@@ -72,7 +116,9 @@ static void BM_trivial_trgles(benchmark::State &state)
     }
 }
 
-BENCHMARK(BM_trivial_trgles)->Arg(100);
-BENCHMARK(BM_octree_trgles)->Arg(100);
+BENCHMARK(BM_random_trivial_trgles)->Arg(100);
+BENCHMARK(BM_random_octree_trgles)->Arg(100);
+BENCHMARK(BM_trivial_trgles1)->Arg(100);
+BENCHMARK(BM_octree_trgles1)->Arg(100);
 
 BENCHMARK_MAIN();

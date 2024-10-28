@@ -162,6 +162,8 @@ Stereometry::point_t Stereometry::plane_t::get_common_point(const plane_t &pln) 
 
     Matrix::matrix2d_t<double> system_matr{b, c,
                                            pln.b, pln.c};
+    if (is_zero(system_matr.det())) return degenerate_get_common_point(pln);
+
     std::pair<float, float> solve;
     float x;
     if (a == 0)
@@ -169,12 +171,12 @@ Stereometry::point_t Stereometry::plane_t::get_common_point(const plane_t &pln) 
         if (pln.a == 0)
         {   
             x = 0;
-            solve = system_matr.calculate_linear(d, pln.d);
+            solve = system_matr.calculate_linear(- d, - pln.d);
         }
         else
         {
             x = - pln.d / pln.a;
-            solve = system_matr.calculate_linear(- a * x - d, 0);
+            solve = system_matr.calculate_linear(- d, 0);
         }
     }
     else
@@ -183,6 +185,22 @@ Stereometry::point_t Stereometry::plane_t::get_common_point(const plane_t &pln) 
         solve = system_matr.calculate_linear(0, - pln.a * x - pln.d);
     }
     return {x, solve.first, solve.second};
+}
+
+Stereometry::point_t Stereometry::plane_t::degenerate_get_common_point(const plane_t &pln) const
+{
+    if (a == 0)
+    {
+        if (!is_zero(b))      return {0, -d, 0};
+        else if (!is_zero(c)) return {0, 0, -d};
+        else
+        {
+            if (d == 0) return {0, 0, 0};
+            else        return {NAN, NAN, NAN};
+        }
+    }
+    // Else
+    return {-d / a, 0, 0};
 }
 
 Stereometry::line_t::line_t(const plane_t &pln1, const plane_t &pln2)

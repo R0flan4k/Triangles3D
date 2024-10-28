@@ -32,19 +32,18 @@ struct triangle_unit_t {
       is_intersect(is_inter) {}
 };
 
-struct octree_trgles_intersect_cntr_t {
+class octree_trgles_intersect_cntr_t {
     using NodeT = octree_node_t<triangle_unit_t>;
-    NodeT octree;
-    std::vector<triangle_unit_t> data;
+    NodeT octree_;
+    std::vector<triangle_unit_t> data_;
 
 public:
     template <typename RandomIt>
     octree_trgles_intersect_cntr_t(size_t n, float octree_half_size,
                                    RandomIt first, const RandomIt last)
-    : octree(point_t{0, 0, 0}, octree_half_size, NULL)
+    : octree_(point_t{0, 0, 0}, octree_half_size, NULL)
     {
-        data.reserve(n);
-
+        data_.reserve(n);
         for (; first != last;)
         {
             float coords[9];
@@ -55,14 +54,20 @@ public:
                             point_t{coords[3], coords[4], coords[5]},
                             point_t{coords[6], coords[7], coords[8]}};
             assert(p[0].valid() && p[1].valid() && p[2].valid());
-            data.emplace_back(p[0], p[1], p[2], false, octree);
+            data_.emplace_back(p[0], p[1], p[2], false, octree_);
         }
+    }
+
+    void dump() const
+    {
+        std::cout << "Data size: " << data_.size() << std::endl;
+        std::cout << "Data capa: " << data_.capacity() << std::endl;
     }
 
     size_t calculate_intersections()
     {
         size_t inters_cnt = 0;
-        for (auto start = data.begin(), end = data.end();
+        for (auto start = data_.begin(), end = data_.end();
              start != end; ++start)
         {
             if (start->is_intersect) 
@@ -82,6 +87,15 @@ public:
             }
         }
         return inters_cnt;
+    }
+
+    void intersections_dump() const
+    {
+        for (size_t i = 0, data_sz = data_.size();
+             i < data_sz; ++i)
+        {
+            if (data_[i].is_intersect) std::cout << i << std::endl;
+        }
     }
 
 private:

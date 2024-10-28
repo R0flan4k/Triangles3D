@@ -27,15 +27,22 @@ int main()
 
     std::vector<float> input(std::istream_iterator<float>(std::cin),
                              std::istream_iterator<float>());
-    float abs_bound = 1 + *(std::max_element(input.cbegin(), input.cend(), 
+    if (input.size() != n * 9)
+    {
+        std::cerr << "Input error: wrong number of points." << std::endl;
+        return 1;
+    }
+    
+    float abs_bound = *(std::max_element(input.cbegin(), input.cend(), 
     [](float a, float b)
     {
         return std::abs(a) < std::abs(b);
     }));
+    abs_bound = std::abs(abs_bound) + 1;
 
     TrglesIntersections::octree_trgles_intersect_cntr_t ts{n, abs_bound, 
                                                            input.cbegin(), input.cend()};
-    size_t intersect_count = ts.calculate_intersections();
-    std::cout << intersect_count << std::endl;
+    ts.calculate_intersections();
+    ts.intersections_dump();
     return 0;
 }
