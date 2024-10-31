@@ -47,4 +47,16 @@ bool abs_cmp(T a, T b)
     return std::abs(a) < std::abs(b);
 }
 
+template <floating_point T>
+static bool are_intersects_ivals(std::pair<T, T> i1,
+                                 std::pair<T, T> i2)
+{
+    return are_geq((i2.first  - i1.first) * 
+                   (i1.second - i2.first), 0.0f) ||
+           are_geq((i1.first  - i2.first) * 
+                   (i2.second - i1.first), 0.0f) ||
+           are_geq((i1.second - i2.first) *
+                   (i2.second - i1.second), 0.0f); 
+}
+
 }

@@ -103,22 +103,49 @@ TEST(Triangle, IsIntersect)
                t5{{0, 0, 0}, {1, 1, 1}, {0, 1, 1}},
                t6{{0.5, 0.5, 0.5}, {1, 1, 1}, {0, 1, 1}},
                t7{{0, 0, 0}, {1, 0, 0}, {0, 1, 0}},
-               t8{{0, 0.5, -0.5}, {0, 0.5, 0.5}, {-1, 0, 0}};
+               t8{{0, 0.5, -0.5}, {0, 0.5, 0.5}, {-1, 0, 0}},
+               t9{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}},
+               t10{{5, 5, 5}, {0, 0, 0}, {5, 0, 0}},
+               t11{{0, 0, 0}, {0, 0, 5}, {5, 5, 5}},
+               t12{{7, 3, 5}, {2, 1, 4}, {3, 3, 3}},
+               t13{{1, 1, 1}, {1, 2, 2}, {2, 2, 2}},
+               t14{{1, 1, 1}, {1, 1, 1}, {1, 1, 1}},
+               t15{{2, 2, 2}, {2, 2, 2}, {2, 2, 2}},
+               t16{{1, 1, 1}, {1, 2, 2}, {0, 0, 0}};
     
     EXPECT_FALSE(t6.is_intersect(t2));
     EXPECT_FALSE(t2.is_intersect(t6));
+    EXPECT_FALSE(t15.is_intersect(t16));
+    EXPECT_FALSE(t16.is_intersect(t15));
     EXPECT_TRUE(t1.is_intersect(t2));
+    EXPECT_TRUE(t2.is_intersect(t1));
     EXPECT_TRUE(t2.is_intersect(t3));
+    EXPECT_TRUE(t3.is_intersect(t2));
     EXPECT_TRUE(t1.is_intersect(t3));
+    EXPECT_TRUE(t3.is_intersect(t1));
     EXPECT_TRUE(t4.is_intersect(t5));
+    EXPECT_TRUE(t5.is_intersect(t4));
     EXPECT_TRUE(t7.is_intersect(t8));
     EXPECT_TRUE(t8.is_intersect(t7));
+    EXPECT_TRUE(t9.is_intersect(t10));
+    EXPECT_TRUE(t10.is_intersect(t9));
+    EXPECT_TRUE(t11.is_intersect(t12));
+    EXPECT_TRUE(t12.is_intersect(t11));
+    EXPECT_TRUE(t13.is_intersect(t14));
+    EXPECT_TRUE(t14.is_intersect(t13));
 
     EXPECT_TRUE(t1.is_intersect(t1));
     EXPECT_TRUE(t2.is_intersect(t2));
     EXPECT_TRUE(t3.is_intersect(t3));
     EXPECT_TRUE(t4.is_intersect(t4));
     EXPECT_TRUE(t5.is_intersect(t5));
+    EXPECT_TRUE(t6.is_intersect(t6));
+    EXPECT_TRUE(t7.is_intersect(t7));
+    EXPECT_TRUE(t8.is_intersect(t8));
+    EXPECT_TRUE(t9.is_intersect(t9));
+    EXPECT_TRUE(t10.is_intersect(t10));
+    EXPECT_TRUE(t11.is_intersect(t11));
+    EXPECT_TRUE(t12.is_intersect(t12));
 }
 
 TEST(Interval, SubsetCheck)
@@ -133,19 +160,65 @@ TEST(Interval, SubsetCheck)
 
 TEST(Triangle, SubsetCheck)
 {
-    triangle_t t1{{0, 0, 0}, {1, 1, 1}, {0, 1, 1}};
+    triangle_t t1{{0, 0, 0}, {1, 1, 1}, {0, 1, 1}},
+               t2{{1, 1, 1}, {1, 2, 2}, {0, 0, 0}};
     
     EXPECT_TRUE(t1.subset_check(point_t{0, 0, 0}));
+    EXPECT_FALSE(t2.subset_check(point_t{2, 2, 2}));
 }
 
 TEST(TrglesIntersections, OctreeIntersectionsCntr)
 {
-    std::vector<float> input {0, 0, 0, 1, 0, 0, 0, 1, 0,
-                              5, 5, 5, 5, 5, 5, 5, 5, 5,
-                              0, 0.5, -0.5, 0, 0.5, 0.5, -1, 0, 0};
-    TrglesIntersections::octree_trgles_intersect_cntr_t ts{3, 6, 
-                                                           input.cbegin(), input.cend()};
-    size_t inters = ts.calculate_intersections();
+    std::vector<float> i1{0, 0, 0, 1, 0, 0, 0, 1, 0,
+                          5, 5, 5, 5, 5, 5, 5, 5, 5,
+                          0, 0.5, -0.5, 0, 0.5, 0.5, -1, 0, 0},
+                       i2{1, 1, 0, 3, 1, 0, 1, 3, 0,
+                          0, 0, 0, 1, 0, 0, 0, 1, 0,
+                          1, 0.5, 0, 1, 0.5, 1, 0, 0, 0.5,
+                          1, 0, 0, 0, 1, 0, 0, 0, 1,
+                          0, 0, 0, 0, 3, 3, 0, 0, 3,
+                          1, 1, 0, 1, 2, 3, 5, 4, 8,
+                          9, 9, 9, 9, 9, 9, 9, 9, 9,
+                          8, 8, 8, 8, 8, 8, -10, 8, 8},
+                       i3{0, 0, 0, 1, 1, 1, 0, 1, 1,
+                          1, 1, 0, -1, 1, 0, 0, -1, 0,
+                          0, 0, 0, 0, 0, 0, 0, 0, 0,
+                          1, 0, 0, 0, 1, 0, 0, -1, 0,
+                          0, 0, 0, 1, 1, 1, 0, 1, 1,
+                          0.5, 0.5, 0.5, 1, 1, 1, 0, 1, 1,
+                          0, 0, 0, 1, 0, 0, 0, 1, 0,
+                          0, 0.5, -0.5, 0, 0.5, 0.5, -1, 0, 0,
+                          1, 0, 0, 0, 1, 0, 0, 0, 1,
+                          5, 5, 5, 0, 0, 0, 5, 0, 0,
+                          0, 0, 0, 0, 0, 5, 5, 5, 5,
+                          7, 3, 5, 2, 1, 4, 3, 3, 3},
+                       i4{1, 1, 1, 1, 2, 2, 2, 2, 2,
+                          1, 1, 1, 1, 1, 1, 1, 1, 1,
+                          1, 2, 2, 1, 2, 2, 1, 2, 2,
+                          2, 2, 2, 2, 2, 2, 2, 2, 2,
+                          1, 1, 1, 1, 2, 2, 1, 1, 1,
+                          1, 1, 1, 2, 2, 2, 2, 2, 2,
+                          2, 2, 2, 1, 2, 2, 2, 2, 2,
+                          1, 1, 1, 1, 2, 2, 0, 0, 0},
+                       i5{1, 1, 1, 1, 1, 1, 1, 1, 1,
+                          1, 2, 2, 1, 2, 2, 1, 2, 2,
+                          2, 2, 2, 2, 2, 2, 2, 2, 2,
+                          1, 1, 1, 1, 2, 2, 0, 0, 0};
+    TrglesIntersections::octree_trgles_intersect_cntr_t 
+        ts1{3,  6,  i1.cbegin(), i1.cend()},
+        ts2{8,  11, i2.cbegin(), i2.cend()},
+        ts3{12, 10, i3.cbegin(), i3.cend()},
+        ts4{8,  3,  i4.cbegin(), i4.cend()},
+        ts5{4,  3,  i5.cbegin(), i5.cend()};
+    size_t inters1 = ts1.calculate_intersections(),
+           inters2 = ts2.calculate_intersections(),
+           inters3 = ts3.calculate_intersections(),
+           inters4 = ts4.calculate_intersections(),
+           inters5 = ts5.calculate_intersections();
 
-    EXPECT_EQ(inters, 2);
+    EXPECT_EQ(inters1, 2);
+    EXPECT_EQ(inters2, 5);
+    EXPECT_EQ(inters3, 12);
+    EXPECT_EQ(inters4, 8);
+    EXPECT_EQ(inters5, 3);
 }

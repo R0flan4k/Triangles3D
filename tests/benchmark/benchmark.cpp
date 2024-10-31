@@ -74,7 +74,6 @@ static void BM_random_trivial_trgles(benchmark::State &state)
 static void BM_octree_trgles1(benchmark::State &state)
 {
     // Setup.
-    size_t n = 8;
     std::vector<float> input{1, 1, 0, 3, 1, 0, 1, 3, 0,
                              0, 0, 0, 1, 0, 0, 0, 1, 0,
                              1, 0.5, 0, 1, 0.5, 1, 0, 0, 0.5,

@@ -11,6 +11,7 @@
 using DblCmp::are_eq;
 using DblCmp::are_geq;
 using DblCmp::is_zero;
+using DblCmp::are_intersects_ivals;
 
 bool Stereometry::point_t::valid() const
 {
@@ -346,7 +347,7 @@ bool Stereometry::interval_t::subset_check(const point_t &p) const
 
 float Stereometry::interval_t::get_len() const
 {
-    assert(valid());
+    if (!valid()) return 0.0f;
     point_t vect = (ends_.second - ends_.first) * l_.a;
     return vect.get_len();
 }
@@ -378,10 +379,7 @@ bool Stereometry::interval_t::is_intersect_inline(const interval_t &ival) const
     assert(are_collinear_vect(ival.l_.a, l_.a) &&
            are_collinear_vect(l_.a, ival.l_.r0 - l_.r0));
 
-    return are_geq((ival.ends_.first - ends_.first) * 
-                   (ends_.second - ival.ends_.first), 0.0f) ||
-           are_geq((ends_.first - ival.ends_.first) * 
-                   (ival.ends_.second - ends_.first), 0.0f); 
+    return are_intersects_ivals(ends_, ival.ends_);
 }
 
 Stereometry::triangle_t::triangle_t(const point_t &p1, const point_t &p2, const point_t &p3)
@@ -402,8 +400,6 @@ bool Stereometry::triangle_t::valid() const
 
 const Stereometry::interval_t& Stereometry::triangle_t::max_edge() const
 {
-    assert(edges_[0].valid() && edges_[1].valid() && edges_[2].valid());
-
     float len0 = edges_[0].get_len(),
           len1 = edges_[1].get_len(),
           len2 = edges_[2].get_len();
@@ -529,9 +525,17 @@ bool Stereometry::triangle_t::subset_check(const point_t &p) const
 {
     assert(p.valid());
     if (!pln_.subset_check(p)) return false;
-    return are_geq(edges_[0].line().get_distance(p) * edges_[0].line().get_distance(p3_), 0.0f) &&
-           are_geq(edges_[1].line().get_distance(p) * edges_[1].line().get_distance(p1_), 0.0f) &&
-           are_geq(edges_[2].line().get_distance(p) * edges_[2].line().get_distance(p2_), 0.0f);
+
+    point_t pa = p1_ - p, pb = p2_ - p, pc = p3_ - p;
+    point_t u = pb * pc, v = pc * pa;
+    if (!are_geq(u.x * v.x + u.y * v.y + u.z * v.z, 0.0f))
+        return false;
+    
+    point_t w = pa * pb;
+    if (!are_geq(u.x * w.x + u.y * w.y + u.z * w.z, 0.0f))
+        return false;
+    
+    return true;
 }
 
 bool Stereometry::triangle_t::is_special_interval() const

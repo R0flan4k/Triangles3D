@@ -13,6 +13,8 @@ using Stereometry::triangle_t;
 using Stereometry::point_t;
 using DblCmp::are_geq;
 
+const size_t max_depth = 5;
+
 template <typename DataT>
 class octree_node_t {      
     octree_node_t * parent_;       
@@ -20,23 +22,23 @@ class octree_node_t {
     std::list<DataT*> data_; 
     point_t center_;
     float half_size_;
+    const size_t depth_;
 
 public:
     octree_node_t* parent() const {return parent_;}
     const std::list<DataT*>& data() const {return data_;}
 
-    octree_node_t(point_t center, float half_size, octree_node_t * parent)
-    : parent_(parent), center_(center), half_size_(half_size)
+    octree_node_t(point_t center, float half_size, octree_node_t * parent,
+                  size_t depth = 0)
+    : parent_(parent), center_(center), half_size_(half_size), depth_(depth)
     {
         for (size_t i = 0; i < 8; i++)
             children_[i] = NULL;
     }
 
     octree_node_t(point_t center)
-    : center_(center)
+    : center_(center), parent_(NULL), half_size_(NAN), depth_(0)
     {
-        parent_ = NULL;
-        half_size_ = NAN;
         for (size_t i = 0; i < 8; i++)
             children_[i] = NULL;
     }
@@ -61,7 +63,7 @@ public:
     {
         assert(trgle);
 
-        if (trgle->is_special_point())
+        if (depth_ >= max_depth)
         {
             data_.push_back(trgle);
             return this;
@@ -70,7 +72,7 @@ public:
         int p1_child = get_position(trgle->p1()),
             p2_child = get_position(trgle->p2()), 
             p3_child = get_position(trgle->p3());
-        
+
         // Check if the triangle placed in child node.
         if (p1_child == p2_child && p2_child == p3_child)
         {
@@ -81,7 +83,7 @@ public:
                      center_.y + half_size_ * (p1_child & 2 ? 0.5f : -0.5f),
                      center_.z + half_size_ * (p1_child & 1 ? 0.5f : -0.5f)};
                 children_[p1_child] = new octree_node_t(child_center, half_size_ * 0.5f,
-                                                        this);
+                                                        this, depth_ + 1);
             }
             return children_[p1_child]->insert_trgle(trgle);
         }
