@@ -49,7 +49,6 @@ struct plane_t {
 
 private:
     point_t degenerate_get_common_point(const plane_t &pln) const;
-
 };
 
 struct line_t {
@@ -74,6 +73,7 @@ struct line_t {
     // Get coeeficient t of the intersection point of this line equation.
     // If these lines don't intersect returns NAN.
     float get_intersection(const line_t &line) const;
+    float get_intersection(const plane_t &pln) const;
 };
 
 class interval_t {

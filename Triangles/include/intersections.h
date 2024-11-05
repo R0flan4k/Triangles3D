@@ -58,10 +58,15 @@ public:
         }
     }
 
-    void dump() const
+    void sz_dump() const
     {
         std::cout << "Data size: " << data_.size() << std::endl;
         std::cout << "Data capa: " << data_.capacity() << std::endl;
+    }
+
+    void octree_dump() const
+    {
+        octree_.dump();
     }
 
     size_t calculate_intersections()
@@ -70,21 +75,9 @@ public:
         for (auto start = data_.begin(), end = data_.end();
              start != end; ++start)
         {
-            if (start->is_intersect) 
-            {
-                ++inters_cnt;
-                continue;
-            }
-
             for (NodeT *ocnode = start->ocnode;
                  ocnode != NULL;  ocnode = ocnode->parent())
-            {
-                if (node_check_intersection(*start, *ocnode))
-                {
-                    ++inters_cnt;
-                    break;
-                }
-            }
+                inters_cnt += node_check_intersection(*start, *ocnode);
         }
         return inters_cnt;
     }
@@ -99,9 +92,10 @@ public:
     }
 
 private:
-    bool node_check_intersection(triangle_unit_t &trgle,
-                                 NodeT &ocnode)
+    size_t node_check_intersection(triangle_unit_t &trgle,
+                                   NodeT &ocnode)
     {
+        size_t inters_cnt = 0;
         for (auto start = ocnode.data().begin(), end = ocnode.data().end();
              start != end; ++start)
         {
@@ -109,14 +103,24 @@ private:
             if (*start == &trgle)
                 continue;
 
+            if ((*start)->is_intersect && trgle.is_intersect)
+                continue;
+
             if (trgle.trgle.is_intersect((*start)->trgle))
             {
-                ocnode.set_triangle_intersection(start);
-                return trgle.is_intersect = true;
+                if (!(*start)->is_intersect)
+                {
+                    ocnode.set_triangle_intersection(start);
+                    ++inters_cnt;
+                }
+                if (!trgle.is_intersect)
+                {
+                    trgle.is_intersect = true;
+                    ++inters_cnt;
+                }
             }
-                
         }
-        return false;
+        return inters_cnt;
     }
 };
 

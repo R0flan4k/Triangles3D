@@ -312,6 +312,14 @@ float Stereometry::line_t::get_intersection(const line_t &line) const
     return alt_matr1.det() / alt_sys_matr.det();
 }
 
+float Stereometry::line_t::get_intersection(const plane_t &pln) const
+{
+    assert(valid() && pln.valid());
+
+    return - (pln.a * r0.x + pln.b * r0.y + pln.c * r0.z + pln.d) /
+             (pln.a * a.x  + pln.b * a.y  + pln.c * a.z);
+}
+
 Stereometry::interval_t::interval_t(const std::pair<point_t, point_t> &ends)
 : l_(ends)
 {
@@ -517,8 +525,14 @@ bool Stereometry::triangle_t::is_intersect(const interval_t &ival) const
     assert(ival.valid());
     assert(valid());
 
-    return edges_[0].is_intersect(ival) || edges_[1].is_intersect(ival) ||
-           edges_[2].is_intersect(ival);
+    if (ival.line().is_in(pln_))
+        return edges_[0].is_intersect(ival) || edges_[1].is_intersect(ival) ||
+               edges_[2].is_intersect(ival);
+    else if (ival.line().is_parallel(pln_))
+        return false;
+    // Else
+    point_t p = ival.line().r0 + ival.line().get_intersection(pln_) * ival.line().a;
+    return subset_check(p);
 }
 
 bool Stereometry::triangle_t::subset_check(const point_t &p) const
