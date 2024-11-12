@@ -294,22 +294,27 @@ float Stereometry::line_t::get_point_coeff(const point_t &p) const
 
 float Stereometry::line_t::get_intersection(const line_t &line) const
 {
-    assert(valid() && line.valid());
-    
-    if (!is_intersect(line)) return NAN;
-    Matrix::matrix2d_t<double> sys_matr{a.x, -line.a.x,
-                                        a.y, -line.a.y},
-                                  matr1{line.r0.x - r0.x, -line.a.x,
-                                        line.r0.y - r0.y, -line.a.y};
-    
-    if (!is_zero(sys_matr.det())) return matr1.det() / sys_matr.det();
+    {
+        assert(valid() && line.valid());
 
-    Matrix::matrix2d_t<double> alt_sys_matr{a.y, -line.a.y,
-                                            a.z, -line.a.z},
-                                  alt_matr1{line.r0.y - r0.y, -line.a.y,
-                                            line.r0.z - r0.z, -line.a.z};
-    // Returns NAN if sys_matr.det() and alt_sys_matr.det() are 0.
-    return alt_matr1.det() / alt_sys_matr.det();
+        if (!is_intersect(line))
+            return NAN;
+        Matrix::matrix2d_t<double> sys_matr{a.x, -line.a.x, a.y, -line.a.y},
+            matr1{line.r0.x - r0.x, -line.a.x, line.r0.y - r0.y, -line.a.y};
+        if (!is_zero(sys_matr.det()))
+            return matr1.det() / sys_matr.det();
+
+        Matrix::matrix2d_t<double> alt_sys_matr{a.y, -line.a.y, a.z, -line.a.z},
+            alt_matr1{line.r0.y - r0.y, -line.a.y, line.r0.z - r0.z, -line.a.z};
+        if (!is_zero(alt_sys_matr.det()))
+            return alt_matr1.det() / alt_sys_matr.det();
+
+        Matrix::matrix2d_t<double> fin_sys_matr{a.z, -line.a.z, a.x, -line.a.x},
+            fin_matr1{line.r0.z - r0.z, -line.a.z, line.r0.x - r0.x, -line.a.x};
+        // Returns NAN if sys_matr.det(), alt_sys_matr.det() and fin_sys_matr()
+        // are 0.
+        return fin_matr1.det() / fin_sys_matr.det();
+    }
 }
 
 float Stereometry::line_t::get_intersection(const plane_t &pln) const
@@ -366,8 +371,9 @@ float Stereometry::interval_t::get_intersection(const line_t &line) const
 
     // Coefficient of intersection point (intersection coefficient).
     float ic = l_.get_intersection(line);
-    return are_geq((ic - ends_.first) * (ends_.second - ic), 0.0f) ?
-           ic : NAN;
+    return are_geq((ic - ends_.first) * (ends_.second - ic), 0.0f)
+               ? line.get_intersection(l_)
+               : NAN;
 }
 
 bool Stereometry::interval_t::is_intersect(const interval_t &ival) const
@@ -501,9 +507,7 @@ bool Stereometry::triangle_t::is_intersect_valid(const triangle_t &trgle) const
     if ((std::isnan(intersection_ival1.first) && std::isnan(intersection_ival1.second)) ||
         (std::isnan(intersection_ival2.first) && std::isnan(intersection_ival2.second)))
         return false;
-    interval_t ival1{plns_intersection, intersection_ival1},
-               ival2{plns_intersection, intersection_ival2};
-    return ival1.is_intersect_inline(ival2);
+    return are_intersects_ivals(intersection_ival1, intersection_ival2);
 }
 
 bool Stereometry::triangle_t::is_intersect_inplane(const triangle_t &trgle) const
