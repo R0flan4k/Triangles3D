@@ -514,14 +514,9 @@ bool Stereometry::triangle_t::is_intersect_inplane(const triangle_t &trgle) cons
 {
     assert(valid() && trgle.valid());
     assert(pln_.is_parallel_equal(trgle.plane()).second);
-    
-    for (auto [edges_it1, edges_it2_start] = std::pair{edges_.cbegin(), trgle.edges_.cbegin()}; 
-         edges_it1 != edges_.cend(); ++edges_it1, ++edges_it2_start)
-        for (auto edges_it2 = edges_it2_start; edges_it2 != trgle.edges_.cend();
-             ++edges_it2) 
-            if (edges_it1->is_intersect(*edges_it2))
-                return true;
-    return false;
+
+    return subset_check(trgle.p1_) || subset_check(trgle.p2_) || subset_check(trgle.p3_) ||
+           trgle.subset_check(p1_) || trgle.subset_check(p2_) || trgle.subset_check(p3_);
 }
 
 bool Stereometry::triangle_t::is_intersect(const interval_t &ival) const

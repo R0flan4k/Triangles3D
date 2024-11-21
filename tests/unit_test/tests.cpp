@@ -121,7 +121,9 @@ TEST(Triangle, IsIntersect)
         t23{{1, 0, 1}, {-1, 0, 1}, {0, 0, -1}},
         t24{{0, -1, 0}, {0, 1, 0}, {0, 1, 0}},
         t25{{0, 0, 0}, {5, 5, 0}, {5, 5, 10}},
-        t26{{0.5, 0, 0}, {0, 0, 0}, {0, 0, 0.5}};
+        t26{{0.5, 0, 0}, {0, 0, 0}, {0, 0, 0.5}},
+        t27{{-2.176, 3.92, 0.8},{3.824, 0.408, 0.8}, {0, -3.596, 0.8}},
+        t28{{-1.088, 1.96, 0.8}, {1.912, 0.204, 0.8}, {0, -1.798, 0.8}};
 
     EXPECT_FALSE(t6.is_intersect(t2));
     EXPECT_FALSE(t2.is_intersect(t6));
@@ -157,6 +159,8 @@ TEST(Triangle, IsIntersect)
     EXPECT_TRUE(t24.is_intersect(t23));
     EXPECT_TRUE(t25.is_intersect(t26));
     EXPECT_TRUE(t26.is_intersect(t25));
+    EXPECT_TRUE(t27.is_intersect(t28));
+    EXPECT_TRUE(t28.is_intersect(t27));
 
     EXPECT_TRUE(t1.is_intersect(t1));
     EXPECT_TRUE(t2.is_intersect(t2));

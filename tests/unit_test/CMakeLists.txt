@@ -23,4 +23,6 @@ target_link_libraries(
 	TestSerialization PUBLIC ${GTEST_LIBRARIES} gtest::gtest)
 
 enable_testing()
-add_test(TestSerialization "./TestSerialization")
+add_test(NAME TestSerialization
+	 CONFIGURATIONS unit
+         COMMAND "./TestSerialization")
