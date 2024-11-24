@@ -119,7 +119,8 @@ Stereometry::plane_t::plane_t(const point_t &p1, const point_t &p2,
     point_t v1 = {p2.x - p1.x, p2.y - p1.y, p2.z - p1.z}; 
     point_t v2 = {p3.x - p2.x, p3.y - p2.y, p3.z - p2.z}; 
     // Plane normal vector. n = [v1, v2]
-    point_t n = v1 * v2; 
+    point_t n = v1 * v2;
+
 #if 0
     // Vector normalization for accurate calculations.
     n = n / n.get_len();

@@ -87,7 +87,6 @@ public:
             }
             return children_[p1_child]->insert_trgle(trgle);
         }
-        
         data_.push_back(trgle);
         return this;
     }
