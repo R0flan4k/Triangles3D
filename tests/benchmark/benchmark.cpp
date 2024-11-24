@@ -8,7 +8,7 @@
 #include <limits>
 
 using Octree::octree_node_t;
-using Stereometry::vectr_t;
+using Stereometry::vector_t;
 using TrglesIntersections::triangle_unit_t;
 
 template <typename VectT>
@@ -54,9 +54,9 @@ static void BM_random_trivial_trgles(benchmark::State &state)
 
     for (size_t i = 0; i < n * 9; i += 9)
     {
-        vectr_t p1 = {input[i + 0], input[i + 1], input[i + 2]},
-                p2 = {input[i + 3], input[i + 4], input[i + 5]},
-                p3 = {input[i + 6], input[i + 7], input[i + 8]};
+        vector_t p1 = {input[i + 0], input[i + 1], input[i + 2]},
+                 p2 = {input[i + 3], input[i + 4], input[i + 5]},
+                 p3 = {input[i + 6], input[i + 7], input[i + 8]};
 
         trgles.emplace_back(p1, p2, p3);
     }

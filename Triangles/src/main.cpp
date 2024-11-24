@@ -10,9 +10,9 @@
 #include <iterator>
 #include <algorithm>
 
-using Stereometry::triangle_t;
-using Stereometry::point_t;
 using Octree::octree_node_t;
+using Stereometry::triangle_t;
+using Stereometry::vector_t;
 using TrglesIntersections::triangle_unit_t;
 
 int main()

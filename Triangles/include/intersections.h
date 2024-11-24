@@ -8,9 +8,9 @@
 #include <cassert>
 #include <cmath>
 
-using Stereometry::triangle_t;
-using Stereometry::point_t;
 using Octree::octree_node_t;
+using Stereometry::triangle_t;
+using Stereometry::vector_t;
 
 namespace TrglesIntersections {
 
@@ -19,17 +19,17 @@ struct triangle_unit_t {
     octree_node_t<triangle_unit_t>* ocnode;
     bool is_intersect;
 
-    const point_t& p1() const {return trgle.p1();}
-    const point_t& p2() const {return trgle.p2();}
-    const point_t& p3() const {return trgle.p3();}
+    const vector_t &p1() const { return trgle.p1(); }
+    const vector_t &p2() const { return trgle.p2(); }
+    const vector_t &p3() const { return trgle.p3(); }
     bool is_special_point() const {return trgle.is_special_point();}
     bool is_special_interval() const {return trgle.is_special_interval();}
 
-    triangle_unit_t(const point_t &p1, const point_t &p2,
-                    const point_t &p3, bool is_inter,
-                    octree_node_t<triangle_unit_t> &octree)
-    : trgle(p1, p2, p3), ocnode(octree.insert_trgle(this)),
-      is_intersect(is_inter) {}
+    triangle_unit_t(const vector_t &p1, const vector_t &p2, const vector_t &p3,
+                    bool is_inter, octree_node_t<triangle_unit_t> &octree)
+        : trgle(p1, p2, p3), ocnode(octree.insert_trgle(this)),
+          is_intersect(is_inter)
+    {}
 };
 
 class octree_trgles_intersect_cntr_t {
@@ -41,7 +41,7 @@ public:
     template <typename RandomIt>
     octree_trgles_intersect_cntr_t(size_t n, float octree_half_size,
                                    RandomIt first, const RandomIt last)
-    : octree_(point_t{0, 0, 0}, octree_half_size, NULL)
+        : octree_(vector_t{0, 0, 0}, octree_half_size, NULL)
     {
         data_.reserve(n);
         for (; first != last;)
@@ -50,9 +50,9 @@ public:
             auto point_end = std::next(first, 9);
             std::copy(first, point_end, coords);
             first = point_end;
-            point_t p[3] = {point_t{coords[0], coords[1], coords[2]},
-                            point_t{coords[3], coords[4], coords[5]},
-                            point_t{coords[6], coords[7], coords[8]}};
+            vector_t p[3] = {vector_t{coords[0], coords[1], coords[2]},
+                             vector_t{coords[3], coords[4], coords[5]},
+                             vector_t{coords[6], coords[7], coords[8]}};
             assert(p[0].valid() && p[1].valid() && p[2].valid());
             data_.emplace_back(p[0], p[1], p[2], false, octree_);
         }
