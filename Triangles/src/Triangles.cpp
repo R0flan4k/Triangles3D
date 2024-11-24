@@ -13,22 +13,22 @@ using DblCmp::are_geq;
 using DblCmp::is_zero;
 using DblCmp::are_intersects_ivals;
 
-bool Stereometry::point_t::valid() const
+bool Stereometry::vector_t::valid() const
 {
     return (x == x) && (y == y) && (z == z);
 }
 
-float Stereometry::point_t::get_len() const
+float Stereometry::vector_t::len() const
 {
-    return std::sqrt(x * x + y * y + z * z);
+    return std::sqrt(dot(*this, *this));
 }
 
-void Stereometry::point_t::dump() const
+void Stereometry::vector_t::dump() const
 {
     std::cout << x << ", " << y << ", " << z << '.' << std::endl;
 }
 
-bool Stereometry::operator==(const point_t &lhs, const point_t &rhs)
+bool Stereometry::operator==(const vector_t &lhs, const vector_t &rhs)
 {
     assert(lhs.valid() && rhs.valid());
     return (are_eq(lhs.x, rhs.x)) &&
@@ -36,7 +36,8 @@ bool Stereometry::operator==(const point_t &lhs, const point_t &rhs)
            (are_eq(lhs.z, rhs.z));
 }
 
-Stereometry::point_t Stereometry::operator*(const float coeff, const point_t &vect)
+Stereometry::vector_t Stereometry::operator*(const float coeff,
+                                             const vector_t &vect)
 {
     assert(vect.valid());
     return {coeff * vect.x,
@@ -44,7 +45,8 @@ Stereometry::point_t Stereometry::operator*(const float coeff, const point_t &ve
             coeff * vect.z};
 }
 
-Stereometry::point_t Stereometry::operator*(const point_t &lhs, const point_t &rhs)
+Stereometry::vector_t Stereometry::cross(const vector_t &lhs,
+                                         const vector_t &rhs)
 {
     assert(lhs.valid() && rhs.valid());
     return {lhs.y * rhs.z - lhs.z * rhs.y,     
@@ -52,13 +54,20 @@ Stereometry::point_t Stereometry::operator*(const point_t &lhs, const point_t &r
             lhs.x * rhs.y - lhs.y * rhs.x};
 }
 
-Stereometry::point_t Stereometry::operator/(const point_t &lhs, const float coeff)
+float Stereometry::dot(const vector_t &lhs, const vector_t &rhs)
+{
+    assert(lhs.valid() && rhs.valid());
+    return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
+}
+
+Stereometry::vector_t Stereometry::operator/(const vector_t &lhs,
+                                             const float coeff)
 {
     assert(lhs.valid());
     return {lhs.x / coeff, lhs.y / coeff, lhs.z / coeff};
 }
 
-float Stereometry::operator/(const point_t &lhs, const point_t &rhs)
+float Stereometry::operator/(const vector_t &lhs, const vector_t &rhs)
 {
     assert(lhs.valid() && rhs.valid());
     assert(are_collinear_vect(lhs, rhs));
@@ -71,7 +80,8 @@ float Stereometry::operator/(const point_t &lhs, const point_t &rhs)
     return lhs.x / rhs.x;
 }
 
-Stereometry::point_t Stereometry::operator-(const point_t &lhs, const point_t &rhs)
+Stereometry::vector_t Stereometry::operator-(const vector_t &lhs,
+                                             const vector_t &rhs)
 {
     assert(lhs.valid() && rhs.valid());
     return {lhs.x - rhs.x,
@@ -79,7 +89,8 @@ Stereometry::point_t Stereometry::operator-(const point_t &lhs, const point_t &r
             lhs.z - rhs.z}; 
 }
 
-Stereometry::point_t Stereometry::operator+(const point_t &lhs, const point_t &rhs)
+Stereometry::vector_t Stereometry::operator+(const vector_t &lhs,
+                                             const vector_t &rhs)
 {
     assert(lhs.valid() && rhs.valid());
     return {lhs.x + rhs.x,
@@ -87,24 +98,24 @@ Stereometry::point_t Stereometry::operator+(const point_t &lhs, const point_t &r
             lhs.z + rhs.z}; 
 }
 
-bool Stereometry::are_on_line(const point_t &p1, const point_t &p2,
-                              const point_t &p3)
+bool Stereometry::are_on_line(const vector_t &p1, const vector_t &p2,
+                              const vector_t &p3)
 {
     assert(p1.valid() && p2.valid() && p3.valid());
     return are_collinear_vect(p2 - p1, p3 - p2);
 }
 
-bool Stereometry::are_collinear_vect(const point_t &p1, const point_t &p2)
+bool Stereometry::are_collinear_vect(const vector_t &p1, const vector_t &p2)
 {
     assert(p1.valid() && p2.valid());
-    return (p1 * p2) == point_t{0, 0, 0};
+    return (cross(p1, p2)) == vector_t{0, 0, 0};
 }
 
 Stereometry::plane_t::plane_t(float aa, float bb, float cc, float dd)
 : a(aa), b(bb), c(cc), d(dd) {}
 
-Stereometry::plane_t::plane_t(const point_t &p1, const point_t &p2,
-                              const point_t &p3)
+Stereometry::plane_t::plane_t(const vector_t &p1, const vector_t &p2,
+                              const vector_t &p3)
 {
     assert(p1.valid() && p2.valid() && p3.valid());
 
@@ -116,20 +127,18 @@ Stereometry::plane_t::plane_t(const point_t &p1, const point_t &p2,
     
     // Vectors that on
     // the plane.
-    point_t v1 = {p2.x - p1.x, p2.y - p1.y, p2.z - p1.z}; 
-    point_t v2 = {p3.x - p2.x, p3.y - p2.y, p3.z - p2.z}; 
+    vector_t v1 = p2 - p1, v2 = p3 - p2;
     // Plane normal vector. n = [v1, v2]
-    point_t n = v1 * v2;
-
+    vector_t n = cross(v1, v2);
 #if 0
     // Vector normalization for accurate calculations.
-    n = n / n.get_len();
+    n = n / n.len();
 #endif
 
     a = n.x;
     b = n.y;
     c = n.z;
-    d = - p1.x * n.x - p1.y * n.y - p1.z * n.z;
+    d = -dot(p1, n);
 }
 
 bool Stereometry::plane_t::valid() const
@@ -143,7 +152,7 @@ void Stereometry::plane_t::dump() const
     std::cout << "a = " << a << ", b = " << b << ", c = " << c << ", d = " << d << std::endl;
 }
 
-bool Stereometry::plane_t::subset_check(const point_t &p) const
+bool Stereometry::plane_t::subset_check(const vector_t &p) const
 {
     assert(p.valid());
     return is_zero(p.x * a + p.y * b + p.z * c + d);
@@ -158,7 +167,8 @@ std::pair<bool, bool> Stereometry::plane_t::is_parallel_equal(const plane_t &pln
     };
 }
 
-Stereometry::point_t Stereometry::plane_t::get_common_point(const plane_t &pln) const
+Stereometry::vector_t
+Stereometry::plane_t::get_common_point(const plane_t &pln) const
 {
     assert(valid() && pln.valid());
 
@@ -189,7 +199,8 @@ Stereometry::point_t Stereometry::plane_t::get_common_point(const plane_t &pln) 
     return {x, solve.first, solve.second};
 }
 
-Stereometry::point_t Stereometry::plane_t::degenerate_get_common_point(const plane_t &pln) const
+Stereometry::vector_t
+Stereometry::plane_t::degenerate_get_common_point(const plane_t &pln) const
 {
     if (a == 0)
     {
@@ -211,16 +222,15 @@ Stereometry::line_t::line_t(const plane_t &pln1, const plane_t &pln2)
     // If planes are parallel a and r0 remains invalid.
     if (pln1.is_parallel_equal(pln2).first) return;
 
-    point_t n1 = {pln1.a, pln1.b, pln1.c},
-            n2 = {pln2.a, pln2.b, pln2.c};
-    a = n1 * n2;
+    vector_t n1 = {pln1.a, pln1.b, pln1.c}, n2 = {pln2.a, pln2.b, pln2.c};
+    a = cross(n1, n2);
 #if 0
-    a = a / a.get_len();
+    a = a / a.len();
 #endif
     r0 = pln1.get_common_point(pln2);
 }
 
-Stereometry::line_t::line_t(const std::pair<point_t, point_t> &p)
+Stereometry::line_t::line_t(const std::pair<vector_t, vector_t> &p)
 {
     //                     _     _
     // If points are equal a and r0 remains invalid.
@@ -245,7 +255,8 @@ void Stereometry::line_t::dump() const
 
 bool Stereometry::line_t::is_parallel(const plane_t &pln) const
 {
-    return is_zero(a.x * pln.a + a.y * pln.b + a.z * pln.c);
+    vector_t n = {pln.a, pln.b, pln.c};
+    return is_zero(dot(a, n));
 }
 
 bool Stereometry::line_t::is_in(const plane_t &pln) const
@@ -254,7 +265,7 @@ bool Stereometry::line_t::is_in(const plane_t &pln) const
     return (is_parallel(pln) && pln.subset_check(r0));
 }
 
-bool Stereometry::line_t::subset_check(const point_t &p) const
+bool Stereometry::line_t::subset_check(const vector_t &p) const
 {
     assert(valid() && p.valid());
     return are_collinear_vect(p - r0, a);
@@ -269,26 +280,25 @@ bool Stereometry::line_t::is_intersect(const line_t &line) const
         return true;
     //                           _   _    _     _
     // Two lines intersects if ([a1, a2], r01 - r02) == 0.
-    point_t v_mul = a * line.a;
-    point_t diff = r0 - line.r0;
+    vector_t v_mul = cross(a, line.a), diff = r0 - line.r0;
 #if 0
-    v_mul = v_mul / v_mul.get_len();
-    diff = diff / diff.get_len();
+    v_mul = v_mul / v_mul.len();
+    diff = diff / diff.len();
 #endif
-    return is_zero(v_mul.x * diff.x + v_mul.y * diff.y + v_mul.z * diff.z);
+    return is_zero(dot(v_mul, diff));
 }
 
-float Stereometry::line_t::get_distance(const point_t &p) const
+float Stereometry::line_t::get_distance(const vector_t &p) const
 {
     assert(p.valid());
-    point_t vect = (r0 - p) * a;
-    return vect.get_len() / a.get_len();
+    vector_t vect = cross((r0 - p), a);
+    return vect.len() / a.len();
 }
 
-float Stereometry::line_t::get_point_coeff(const point_t &p) const
+float Stereometry::line_t::get_point_coeff(const vector_t &p) const
 {
     assert(valid() && p.valid());
-    point_t diff = p - r0;
+    vector_t diff = p - r0;
     if (!are_collinear_vect(diff, a)) return NAN;
     return diff / a;
 }
@@ -322,21 +332,22 @@ float Stereometry::line_t::get_intersection(const plane_t &pln) const
 {
     assert(valid() && pln.valid());
 
-    return - (pln.a * r0.x + pln.b * r0.y + pln.c * r0.z + pln.d) /
-             (pln.a * a.x  + pln.b * a.y  + pln.c * a.z);
+    vector_t n = {pln.a, pln.b, pln.c};
+    return -(dot(n, r0) + pln.d) / (dot(n, a));
 }
 
-Stereometry::interval_t::interval_t(const std::pair<point_t, point_t> &ends)
-: l_(ends)
+Stereometry::interval_t::interval_t(const std::pair<vector_t, vector_t> &ends)
+    : l_(ends)
 {
     if (!l_.valid()) return;
-
     ends_ = {l_.get_point_coeff(ends.first),
              l_.get_point_coeff(ends.second)};
 }
 
-Stereometry::interval_t::interval_t(const line_t &l, const std::pair<float, float> ends)
-: l_(l), ends_(ends) {}
+Stereometry::interval_t::interval_t(const line_t &l,
+                                    const std::pair<float, float> ends)
+    : l_(l), ends_(ends)
+{}
 
 bool Stereometry::interval_t::valid() const
 {
@@ -351,19 +362,12 @@ void Stereometry::interval_t::dump() const
     std::cout << "Ends: " << ends_.first << " " << ends_.second << std::endl;
 }
 
-bool Stereometry::interval_t::subset_check(const point_t &p) const
+bool Stereometry::interval_t::subset_check(const vector_t &p) const
 {
     assert(p.valid());
     if (!l_.subset_check(p)) return false;
     float coeff = l_.get_point_coeff(p);
     return are_geq((coeff - ends_.first) * (ends_.second - coeff), 0.0f);
-}
-
-float Stereometry::interval_t::get_len() const
-{
-    if (!valid()) return 0.0f;
-    point_t vect = (ends_.second - ends_.first) * l_.a;
-    return vect.get_len();
 }
 
 float Stereometry::interval_t::get_intersection(const line_t &line) const
@@ -397,13 +401,21 @@ bool Stereometry::interval_t::is_intersect_inline(const interval_t &ival) const
     return are_intersects_ivals(ends_, ival.ends_);
 }
 
-Stereometry::triangle_t::triangle_t(const point_t &p1, const point_t &p2, const point_t &p3)
-: p1_(p1), p2_(p2), p3_(p3), pln_(p1, p2, p3)
+float Stereometry::interval_t::len() const
 {
-    using EndsT = typename std::pair<point_t, point_t>;
-    edges_.push_back(interval_t{EndsT{p1, p2}});
-    edges_.push_back(interval_t{EndsT{p2, p3}});
-    edges_.push_back(interval_t{EndsT{p3, p1}});
+    if (!valid())
+        return 0.0f;
+    vector_t vect = (ends_.second - ends_.first) * l_.a;
+    return vect.len();
+}
+
+using EndsT = typename std::pair<Stereometry::vector_t, Stereometry::vector_t>;
+Stereometry::triangle_t::triangle_t(const vector_t &p1, const vector_t &p2,
+                                    const vector_t &p3)
+    : p1_(p1), p2_(p2), p3_(p3), pln_(p1, p2, p3),
+      edges_({interval_t{EndsT{p1, p2}}, interval_t{EndsT{p2, p3}},
+              interval_t{EndsT{p3, p1}}})
+{
 }
 
 bool Stereometry::triangle_t::valid() const
@@ -413,15 +425,18 @@ bool Stereometry::triangle_t::valid() const
            edges_[0].valid() && edges_[1].valid() && edges_[2].valid();
 }
 
+struct EdgesCompT {
+    using edge_t = Stereometry::interval_t;
+    bool operator()(const edge_t &lhs, const edge_t &rhs) const
+    {
+        return lhs.len() < rhs.len();
+    }
+};
+
 const Stereometry::interval_t& Stereometry::triangle_t::max_edge() const
 {
-    float len0 = edges_[0].get_len(),
-          len1 = edges_[1].get_len(),
-          len2 = edges_[2].get_len();
-        
-    if (len0 > len1)
-        return len0 > len2 ? edges_[0] : edges_[2];
-    return len1 > len2 ? edges_[1] : edges_[2];
+    auto it = std::max_element(edges_.cbegin(), edges_.cend(), EdgesCompT{});
+    return *it;
 }
 
 std::pair<float, float> Stereometry::triangle_t::get_intersection_interval(const line_t &line) const
@@ -531,21 +546,22 @@ bool Stereometry::triangle_t::is_intersect(const interval_t &ival) const
     else if (ival.line().is_parallel(pln_))
         return false;
     // Else
-    point_t p = ival.line().r0 + ival.line().get_intersection(pln_) * ival.line().a;
+    vector_t p =
+        ival.line().r0 + ival.line().get_intersection(pln_) * ival.line().a;
     return subset_check(p);
 }
 
-bool Stereometry::triangle_t::subset_check(const point_t &p) const
+bool Stereometry::triangle_t::subset_check(const vector_t &p) const
 {
     assert(p.valid());
     if (!pln_.subset_check(p)) return false;
 
-    point_t pa = p1_ - p, pb = p2_ - p, pc = p3_ - p;
-    point_t u = pb * pc, v = pc * pa;
+    vector_t pa = p1_ - p, pb = p2_ - p, pc = p3_ - p;
+    vector_t u = cross(pb, pc), v = cross(pc, pa);
     if (!are_geq(u.x * v.x + u.y * v.y + u.z * v.z, 0.0f))
         return false;
-    
-    point_t w = pa * pb;
+
+    vector_t w = cross(pa, pb);
     if (!are_geq(u.x * w.x + u.y * w.y + u.z * w.z, 0.0f))
         return false;
     

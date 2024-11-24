@@ -18,7 +18,7 @@ add_executable(
 target_link_libraries(
 	BenchmarkSerialization PUBLIC ${benchmark_LIBRARIES} benchmark::benchmark_main)
 
-SET(GCC_LINK_FLAGS "-isystem /Users/yhr/Programs/benchmark/include -lbenchmark -pthread")
+SET(GCC_LINK_FLAGS "-lbenchmark -lpthread")
 SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_LINK_FLAGS}")
 
 enable_testing()

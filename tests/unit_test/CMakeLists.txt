@@ -20,7 +20,7 @@ add_executable(
 	TestSerialization ${CMAKE_CURRENT_SOURCE_DIR}/tests.cpp ${CMAKE_SOURCE_DIR}/Triangles/src/Triangles.cpp)
 
 target_link_libraries(
-	TestSerialization PUBLIC ${GTEST_LIBRARIES} gtest::gtest)
+	TestSerialization PUBLIC ${GTEST_LIBRARIES} GTest::gtest GTest::gtest_main)
 
 enable_testing()
 add_test(NAME TestSerialization

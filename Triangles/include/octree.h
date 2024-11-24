@@ -9,18 +9,62 @@
 
 namespace Octree {
 
-using Stereometry::triangle_t;
-using Stereometry::point_t;
 using DblCmp::are_geq;
+using Stereometry::triangle_t;
+using Stereometry::vector_t;
 
 const size_t max_depth = 5;
 
+template <typename ChildT> struct ocnode_children_buff {
+    std::array<ChildT *, 8> children;
+
+    ocnode_children_buff() noexcept
+    {
+        for (size_t i = 0; i < 8; ++i)
+            children[i] = nullptr;
+    }
+
+    virtual ~ocnode_children_buff()
+    {
+        for (size_t i = 0; i < 8; i++)
+            delete children[i];
+    }
+
+    ocnode_children_buff(const ocnode_children_buff &c) noexcept
+    {
+        for (size_t i = 0; i < 8; ++i)
+            children[i] = c.children[i];
+    }
+
+    ocnode_children_buff(ocnode_children_buff &&c) noexcept
+    {
+        for (size_t i = 0; i < 8; ++i)
+            std::swap(children[i], c.children[i]);
+    }
+
+    ocnode_children_buff &operator=(const ocnode_children_buff &c) noexcept
+    {
+        for (size_t i = 0; i < 8; ++i)
+            children[i] = c.children[i];
+        return *this;
+    }
+
+    ocnode_children_buff &operator=(ocnode_children_buff &&c) noexcept
+    {
+        if (&c == this)
+            return *this;
+        for (size_t i = 0; i < 8; ++i)
+            std::swap(children[i], c.children[i]);
+        return *this;
+    }
+};
+
 template <typename DataT>
-class octree_node_t {      
+class octree_node_t final : public ocnode_children_buff<octree_node_t<DataT>> {
+    using ocnode_children_buff<octree_node_t<DataT>>::children;
     octree_node_t * parent_;       
-    octree_node_t * children_[8];
-    std::list<DataT*> data_; 
-    point_t center_;
+    std::list<DataT*> data_;
+    vector_t center_;
     float half_size_;
     const size_t depth_;
 
@@ -28,28 +72,16 @@ public:
     octree_node_t* parent() const {return parent_;}
     const std::list<DataT*>& data() const {return data_;}
 
-    octree_node_t(point_t center, float half_size, octree_node_t * parent,
+    octree_node_t(vector_t center, float half_size, octree_node_t *parent,
                   size_t depth = 0)
-    : parent_(parent), center_(center), half_size_(half_size), depth_(depth)
-    {
-        for (size_t i = 0; i < 8; i++)
-            children_[i] = NULL;
-    }
+        : parent_(parent), center_(center), half_size_(half_size), depth_(depth)
+    {}
 
-    octree_node_t(point_t center)
-    : center_(center), parent_(NULL), half_size_(NAN), depth_(0)
-    {
-        for (size_t i = 0; i < 8; i++)
-            children_[i] = NULL;
-    }
+    octree_node_t(vector_t center)
+        : parent_(nullptr), center_(center), half_size_(NAN), depth_(0)
+    {}
 
-    ~octree_node_t()
-    {
-        for (size_t i = 0; i < 8; i++)
-            delete children_[i];
-    }
-
-    int get_position(const point_t &p) const
+    int get_position(const vector_t &p) const
     {
         assert(p.valid());
         int res = 0;
@@ -76,17 +108,18 @@ public:
         // Check if the triangle placed in child node.
         if (p1_child == p2_child && p2_child == p3_child)
         {
-            if (children_[p1_child] == NULL)
+            if (children[p1_child] == nullptr)
             {
-                point_t child_center = 
-                    {center_.x + half_size_ * (p1_child & 4 ? 0.5f : -0.5f),
-                     center_.y + half_size_ * (p1_child & 2 ? 0.5f : -0.5f),
-                     center_.z + half_size_ * (p1_child & 1 ? 0.5f : -0.5f)};
-                children_[p1_child] = new octree_node_t(child_center, half_size_ * 0.5f,
-                                                        this, depth_ + 1);
+                vector_t child_center = {
+                    center_.x + half_size_ * (p1_child & 4 ? 0.5f : -0.5f),
+                    center_.y + half_size_ * (p1_child & 2 ? 0.5f : -0.5f),
+                    center_.z + half_size_ * (p1_child & 1 ? 0.5f : -0.5f)};
+                children[p1_child] = new octree_node_t(
+                    child_center, half_size_ * 0.5f, this, depth_ + 1);
             }
-            return children_[p1_child]->insert_trgle(trgle);
+            return children[p1_child]->insert_trgle(trgle);
         }
+
         data_.push_back(trgle);
         return this;
     }
@@ -115,14 +148,13 @@ public:
         }
         for (size_t i = 0; i < 8; ++i)
         {
-            if (children_[i])
+            if (children[i])
             {
                 std::cout << "\nChild[" << i << "]:\n";
-                children_[i]->dump();
+                children[i]->dump();
             }
         }
         std::cout << "===========================================" << std::endl;
     }
 };
-
 }
