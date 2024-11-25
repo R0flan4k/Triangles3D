@@ -16,6 +16,7 @@ using Stereometry::vector_t;
 const size_t max_depth = 5;
 
 template <typename ChildT> struct ocnode_children_buff {
+protected:
     std::array<ChildT *, 8> children;
 
     ocnode_children_buff() noexcept
@@ -60,7 +61,7 @@ template <typename ChildT> struct ocnode_children_buff {
 };
 
 template <typename DataT>
-class octree_node_t final : public ocnode_children_buff<octree_node_t<DataT>> {
+class octree_node_t final : private ocnode_children_buff<octree_node_t<DataT>> {
     using ocnode_children_buff<octree_node_t<DataT>>::children;
     octree_node_t * parent_;       
     std::list<DataT*> data_;
