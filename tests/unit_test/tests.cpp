@@ -1,6 +1,7 @@
-#include "gtest/gtest.h"
 #include "Triangles.h"
 #include "intersections.h"
+#include "linear_systems.h"
+#include "gtest/gtest.h"
 
 #include <vector>
 
@@ -110,6 +111,7 @@ TEST(Triangle, IsIntersect)
     EXPECT_FALSE(t2.is_intersect(t6));
     EXPECT_FALSE(t15.is_intersect(t16));
     EXPECT_FALSE(t16.is_intersect(t15));
+
     EXPECT_TRUE(t1.is_intersect(t2));
     EXPECT_TRUE(t2.is_intersect(t1));
     EXPECT_TRUE(t2.is_intersect(t3));
@@ -230,4 +232,12 @@ TEST(TrglesIntersections, OctreeIntersectionsCntr)
     EXPECT_EQ(inters7, 3);
     EXPECT_EQ(inters8, 5);
     EXPECT_EQ(inters9, 3);
+}
+
+TEST(LinearSystems, Solving)
+{
+    LinearSystems::linear_system_t<double> ls({2, 1, 1, 5}, {4, 0});
+    auto solve_it = ls.calculate_linear();
+    EXPECT_EQ(*(solve_it.first++), 20.d / 9);
+    EXPECT_EQ(*(solve_it.first++), -4.d / 9);
 }

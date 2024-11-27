@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED on)
 
 include_directories(
 	${CMAKE_SOURCE_DIR}/Triangles/include
+	${CMAKE_SOURCE_DIR}/Matrix/Matrix/include
 	${benchmark_INCLUDE_DIRS}
 )
 

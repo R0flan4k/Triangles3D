@@ -15,7 +15,7 @@ set(SRCS
 add_executable(Triangles.x)
 
 target_sources(Triangles.x PRIVATE ${SRCS})
-target_include_directories(Triangles.x PUBLIC "${CMAKE_SOURCE_DIR}/Triangles/include")
+target_include_directories(Triangles.x PUBLIC "${CMAKE_SOURCE_DIR}/Triangles/include" "${CMAKE_SOURCE_DIR}/Matrix/Matrix/include")
 
 enable_testing()
 add_subdirectory(${CMAKE_SOURCE_DIR}/tests)

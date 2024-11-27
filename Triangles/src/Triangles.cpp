@@ -1,6 +1,6 @@
 #include "Triangles.h"
-#include "matrix.h"
 #include "double_comparing.h"
+#include "linear_systems.h"
 
 #include <cassert>
 #include <functional>
@@ -167,14 +167,24 @@ std::pair<bool, bool> Stereometry::plane_t::is_parallel_equal(const plane_t &pln
     };
 }
 
+static std::pair<float, float>
+calculate_linear2d(const Matrices::const_matrix_t<double> &matr, double f1,
+                   double f2)
+{
+    LinearSystems::linear_system_t<double> ls(matr,
+                                              {f1, f2}); // ON NE EST ETO SUKA
+    auto solve_it = ls.calculate_linear();
+    return std::make_pair(*(solve_it.first++), *(solve_it.first++));
+}
+
 Stereometry::vector_t
 Stereometry::plane_t::get_common_point(const plane_t &pln) const
 {
     assert(valid() && pln.valid());
 
-    Matrix::matrix2d_t<double> system_matr{b, c,
-                                           pln.b, pln.c};
-    if (is_zero(system_matr.det())) return degenerate_get_common_point(pln);
+    Matrices::const_matrix_t<double> system_matr{b, c, pln.b, pln.c};
+    if (is_zero(system_matr.calculate_det()))
+        return degenerate_get_common_point(pln);
 
     std::pair<float, float> solve;
     float x;
@@ -183,20 +193,20 @@ Stereometry::plane_t::get_common_point(const plane_t &pln) const
         if (pln.a == 0)
         {   
             x = 0;
-            solve = system_matr.calculate_linear(- d, - pln.d);
+            solve = calculate_linear2d(system_matr, -d, -pln.d);
         }
         else
         {
             x = - pln.d / pln.a;
-            solve = system_matr.calculate_linear(- d, 0);
+            solve = calculate_linear2d(system_matr, -d, 0);
         }
     }
     else
     {
         x = - d / a;
-        solve = system_matr.calculate_linear(0, - pln.a * x - pln.d);
+        solve = calculate_linear2d(system_matr, 0, -pln.a * x - pln.d);
     }
-    return {x, solve.first, solve.second};
+    return {x, solve.second, solve.first};
 }
 
 Stereometry::vector_t
@@ -310,21 +320,24 @@ float Stereometry::line_t::get_intersection(const line_t &line) const
 
         if (!is_intersect(line))
             return NAN;
-        Matrix::matrix2d_t<double> sys_matr{a.x, -line.a.x, a.y, -line.a.y},
+        Matrices::const_matrix_t<double> sys_matr{a.x, -line.a.x, a.y,
+                                                  -line.a.y},
             matr1{line.r0.x - r0.x, -line.a.x, line.r0.y - r0.y, -line.a.y};
-        if (!is_zero(sys_matr.det()))
-            return matr1.det() / sys_matr.det();
+        if (!is_zero(sys_matr.calculate_det()))
+            return matr1.calculate_det() / sys_matr.det();
 
-        Matrix::matrix2d_t<double> alt_sys_matr{a.y, -line.a.y, a.z, -line.a.z},
+        Matrices::const_matrix_t<double> alt_sys_matr{a.y, -line.a.y, a.z,
+                                                      -line.a.z},
             alt_matr1{line.r0.y - r0.y, -line.a.y, line.r0.z - r0.z, -line.a.z};
-        if (!is_zero(alt_sys_matr.det()))
-            return alt_matr1.det() / alt_sys_matr.det();
+        if (!is_zero(alt_sys_matr.calculate_det()))
+            return alt_matr1.calculate_det() / alt_sys_matr.det();
 
-        Matrix::matrix2d_t<double> fin_sys_matr{a.z, -line.a.z, a.x, -line.a.x},
+        Matrices::const_matrix_t<double> fin_sys_matr{a.z, -line.a.z, a.x,
+                                                      -line.a.x},
             fin_matr1{line.r0.z - r0.z, -line.a.z, line.r0.x - r0.x, -line.a.x};
         // Returns NAN if sys_matr.det(), alt_sys_matr.det() and fin_sys_matr()
         // are 0.
-        return fin_matr1.det() / fin_sys_matr.det();
+        return fin_matr1.calculate_det() / fin_sys_matr.calculate_det();
     }
 }
 

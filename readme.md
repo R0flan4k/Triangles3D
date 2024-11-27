@@ -12,6 +12,11 @@ git clone git@github.com:R0flan4k/Triangles3D.git
 cd Triangles3D
 ```
 
+And init submodules.
+```
+git submodule update --init --recursive
+```
+
 Next download conan into virtual environments:
 ```
 python3 -m venv .venv
