@@ -6,12 +6,13 @@
 #include <array>
 #include <cassert>
 #include <cmath>
+#include <optional>
 #include <utility>
 
 namespace Stereometry {
 
 struct vector_t {
-    float x = NAN, y = NAN, z = NAN;
+    std::optional<float> x, y, z;
 
     bool valid() const;
     float len() const;
@@ -35,8 +36,8 @@ bool are_collinear_vect(const vector_t &p1, const vector_t &p2);
 struct plane_t {
     // Plane equation:
     // ax + by + cz + d = 0.
-    float a, b, c, d; 
-                       
+    std::optional<float> a, b, c, d;
+
     plane_t(float a, float b, float c, float d);
     plane_t(const vector_t &p1, const vector_t &p2, const vector_t &p3);
     bool valid() const;
@@ -97,6 +98,7 @@ public:
     // Get coefficient t of intersection of line equation.
     float get_intersection(const line_t &line) const;
     bool is_intersect(const interval_t &ival) const;
+    bool is_intersect(const line_t &line) const;
 
     // Check if the interval intersects another interval,
     // that's located on the same line.
@@ -130,6 +132,7 @@ public:
     // If it isn't located on the plane, that is UB.
     bool is_intersect_inplane(const triangle_t &trgle) const;
     bool is_intersect(const interval_t &ival) const;
+    bool is_intersect(const line_t &line) const;
     bool subset_check(const vector_t &p) const;
 
     // Check if the triangle is degenerated into a interval.

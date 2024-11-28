@@ -86,9 +86,12 @@ public:
     {
         assert(p.valid());
         int res = 0;
-        if (are_geq(p.x, center_.x)) res |= 4;
-        if (are_geq(p.y, center_.y)) res |= 2;
-        if (are_geq(p.z, center_.z)) res |= 1;
+        if (are_geq(*p.x, *center_.x))
+            res |= 4;
+        if (are_geq(*p.y, *center_.y))
+            res |= 2;
+        if (are_geq(*p.z, *center_.z))
+            res |= 1;
         return res;
     }
 
@@ -112,9 +115,9 @@ public:
             if (children[p1_child] == nullptr)
             {
                 vector_t child_center = {
-                    center_.x + half_size_ * (p1_child & 4 ? 0.5f : -0.5f),
-                    center_.y + half_size_ * (p1_child & 2 ? 0.5f : -0.5f),
-                    center_.z + half_size_ * (p1_child & 1 ? 0.5f : -0.5f)};
+                    *center_.x + half_size_ * (p1_child & 4 ? 0.5f : -0.5f),
+                    *center_.y + half_size_ * (p1_child & 2 ? 0.5f : -0.5f),
+                    *center_.z + half_size_ * (p1_child & 1 ? 0.5f : -0.5f)};
                 children[p1_child] = new octree_node_t(
                     child_center, half_size_ * 0.5f, this, depth_ + 1);
             }
@@ -135,16 +138,23 @@ public:
     {
         std::cout << "===========================================" << std::endl;
         std::cout << "              Octree node                  " << std::endl;
-        std::cout << "Center: \t" << center_.x << ", " << center_.y << ", " << center_.z << std::endl;
+        std::cout << "Center: \t" << *center_.x << ", " << *center_.y << ", "
+                  << *center_.z << std::endl;
         std::cout << "Half size: \t" << half_size_ << std::endl;
         std::cout << "Triangles:" << std::endl;
         size_t i = 0;
         for (auto start = data_.cbegin(), end = data_.cend(); start != end; ++start, ++i)
         {
             std::cout << "\t[" << i << "]:" << std::endl;
-            std::cout << "\t\t" << (*start)->p1().x << ", " << (*start)->p1().y << ", " << (*start)->p1().z << std::endl;
-            std::cout << "\t\t" << (*start)->p2().x << ", " << (*start)->p2().y << ", " << (*start)->p2().z << std::endl;
-            std::cout << "\t\t" << (*start)->p3().x << ", " << (*start)->p3().y << ", " << (*start)->p3().z << std::endl;
+            std::cout << "\t\t" << *(*start)->p1().x << ", "
+                      << *(*start)->p1().y << ", " << *(*start)->p1().z
+                      << std::endl;
+            std::cout << "\t\t" << *(*start)->p2().x << ", "
+                      << *(*start)->p2().y << ", " << *(*start)->p2().z
+                      << std::endl;
+            std::cout << "\t\t" << *(*start)->p3().x << ", "
+                      << *(*start)->p3().y << ", " << *(*start)->p3().z
+                      << std::endl;
             std::cout << "\tIs intersect:\t" << (*start)->is_intersect << std::endl;
         }
         for (size_t i = 0; i < 8; ++i)

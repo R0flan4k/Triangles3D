@@ -402,3 +402,4 @@ build/*
 CMakeUserPresets.json
 .venv/
 .venv/*
+Triangles/include/triangles_exceptions.h
