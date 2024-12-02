@@ -31,10 +31,11 @@ protected:
             delete children[i];
     }
 
-    ocnode_children_buff(const ocnode_children_buff &c) noexcept
+    ocnode_children_buff(const ocnode_children_buff &c)
     {
         for (size_t i = 0; i < 8; ++i)
-            children[i] = c.children[i];
+            if (c.children[i])
+                children[i] = new ChildT(c.children[i]);
     }
 
     ocnode_children_buff(ocnode_children_buff &&c) noexcept
@@ -43,10 +44,13 @@ protected:
             std::swap(children[i], c.children[i]);
     }
 
-    ocnode_children_buff &operator=(const ocnode_children_buff &c) noexcept
+    ocnode_children_buff &operator=(const ocnode_children_buff &c)
     {
+        if (&c == this)
+            return *this;
+        ocnode_children_buff<ChildT> tmp(c);
         for (size_t i = 0; i < 8; ++i)
-            children[i] = c.children[i];
+            std::swap(children[i], c.children[i]);
         return *this;
     }
 
