@@ -24,6 +24,8 @@ int main()
         std::cerr << "Input error: number of triangles." << std::endl;
         return 1;
     }
+    if (n == 0)
+        return 0;
 
     std::vector<float> input(std::istream_iterator<float>(std::cin),
                              std::istream_iterator<float>());
