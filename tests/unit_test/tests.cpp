@@ -31,16 +31,12 @@ TEST(Stereometry, AreOnLine)
 
 TEST(Plane, DegeneratePlanes)
 {
-    plane_t pln1{{1, 0, 0}, {-4, 2, 0}, {-1, -1, 0}},
-            pln2{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}},
-            pln3{{0, 0, 0}, {0, 0, 0}, {1, 2, 3}};
+    plane_t pln1{{1, 0, 0}, {-4, 2, 0}, {-1, -1, 0}};
 
     EXPECT_EQ(pln1.a, 0);
     EXPECT_EQ(pln1.b, 0);
     EXPECT_EQ(pln1.d, 0);
     EXPECT_NE(pln1.c, 0);
-    EXPECT_FALSE(pln2.valid());
-    EXPECT_FALSE(pln3.valid());
 }
 
 TEST(Plane, SubsetCheck)
@@ -78,7 +74,7 @@ TEST(Line, GetIntersection)
 
 TEST(Triangle, IsIntersect)
 {
-    triangle_t t1{{0, 0, 0}, {1, 1, 1}, {0, 1, 1}},
+    gen_triangle_t t1{{0, 0, 0}, {1, 1, 1}, {0, 1, 1}},
         t2{{1, 1, 0}, {-1, 1, 0}, {0, -1, 0}},
         t3{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}},
         t4{{1, 0, 0}, {0, 1, 0}, {0, -1, 0}},
@@ -104,7 +100,7 @@ TEST(Triangle, IsIntersect)
         t24{{0, -1, 0}, {0, 1, 0}, {0, 1, 0}},
         t25{{0, 0, 0}, {5, 5, 0}, {5, 5, 10}},
         t26{{0.5, 0, 0}, {0, 0, 0}, {0, 0, 0.5}},
-        t27{{-2.176, 3.92, 0.8},{3.824, 0.408, 0.8}, {0, -3.596, 0.8}},
+        t27{{-2.176, 3.92, 0.8}, {3.824, 0.408, 0.8}, {0, -3.596, 0.8}},
         t28{{-1.088, 1.96, 0.8}, {1.912, 0.204, 0.8}, {0, -1.798, 0.8}};
 
     EXPECT_FALSE(t6.is_intersect(t2));

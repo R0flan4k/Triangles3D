@@ -50,7 +50,7 @@ static void BM_random_trivial_trgles(benchmark::State &state)
     size_t n = state.range(0);
     std::vector<float> input;
     generate_input(n, input, -20.f, 20.f);
-    std::vector<triangle_t> trgles;
+    std::vector<gen_triangle_t> trgles;
 
     for (size_t i = 0; i < n * 9; i += 9)
     {
@@ -96,14 +96,23 @@ static void BM_trivial_trgles1(benchmark::State &state)
 {
     // Setup.
     size_t n = 8;
-    std::vector<triangle_t> trgles{triangle_t{{1, 1, 0}, {3, 1, 0}, {1, 3, 0}},
-                                   triangle_t{{0, 0, 0}, {1, 0, 0}, {0, 1, 0}},
-                                   triangle_t{{1, 0.5, 0}, {1, 0.5, 1}, {0, 0, 0.5}},
-                                   triangle_t{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}},
-                                   triangle_t{{0, 0, 0}, {0, 3, 3}, {0, 0, 3}},
-                                   triangle_t{{1, 1, 0}, {1, 2, 3}, {5, 4, 8}},
-                                   triangle_t{{9, 9, 9}, {9, 9, 9}, {9, 9, 9}},
-                                   triangle_t{{8, 8, 8}, {8, 8, 8}, {-10, 8, 8}}};
+    std::vector<gen_triangle_t> trgles;
+    trgles.emplace_back(vector_t{1, 1, 0}, vector_t{3, 1, 0},
+                        vector_t{1, 3, 0});
+    trgles.emplace_back(vector_t{0, 0, 0}, vector_t{1, 0, 0},
+                        vector_t{0, 1, 0});
+    trgles.emplace_back(vector_t{1, 0.5, 0}, vector_t{1, 0.5, 1},
+                        vector_t{0, 0, 0.5});
+    trgles.emplace_back(vector_t{1, 0, 0}, vector_t{0, 1, 0},
+                        vector_t{0, 0, 1});
+    trgles.emplace_back(vector_t{0, 0, 0}, vector_t{0, 3, 3},
+                        vector_t{0, 0, 3});
+    trgles.emplace_back(vector_t{1, 1, 0}, vector_t{1, 2, 3},
+                        vector_t{5, 4, 8});
+    trgles.emplace_back(vector_t{9, 9, 9}, vector_t{9, 9, 9},
+                        vector_t{9, 9, 9});
+    trgles.emplace_back(vector_t{8, 8, 8}, vector_t{8, 8, 8},
+                        vector_t{-10, 8, 8});
 
     // This code gets timed.
     for (auto _ : state)

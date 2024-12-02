@@ -12,9 +12,8 @@
 namespace Stereometry {
 
 struct vector_t {
-    std::optional<float> x, y, z;
+    float x, y, z;
 
-    bool valid() const;
     float len() const;
     void dump() const;
 };
@@ -32,15 +31,16 @@ vector_t operator-(const vector_t &lhs, const vector_t &rhs);
 vector_t operator+(const vector_t &lhs, const vector_t &rhs);
 bool are_on_line(const vector_t &p1, const vector_t &p2, const vector_t &p3);
 bool are_collinear_vect(const vector_t &p1, const vector_t &p2);
+std::pair<vector_t, vector_t>
+get_farthest(const vector_t &p1, const vector_t &p2, const vector_t &p3);
 
 struct plane_t {
     // Plane equation:
     // ax + by + cz + d = 0.
-    std::optional<float> a, b, c, d;
+    float a, b, c, d;
 
     plane_t(float a, float b, float c, float d);
     plane_t(const vector_t &p1, const vector_t &p2, const vector_t &p3);
-    bool valid() const;
     void dump() const;
     bool subset_check(const vector_t &p) const;
 
@@ -59,7 +59,6 @@ struct line_t {
 
     line_t(const plane_t &pln1, const plane_t &pln2);
     line_t(const std::pair<vector_t, vector_t> &p);
-    bool valid() const;
     void dump() const;
     bool is_parallel(const plane_t &pln) const;
     bool is_in(const plane_t &pln) const;
@@ -87,10 +86,11 @@ class interval_t {
 public:
     const line_t& line() const {return l_;}
     const std::pair<float, float> ends() const {return ends_;}
+    vector_t ends1() const { return l_.r0 + ends_.first * l_.a; }
+    vector_t ends2() const { return l_.r0 + ends_.second * l_.a; }
 
     interval_t(const std::pair<vector_t, vector_t> &ends);
     interval_t(const line_t &l, const std::pair<float, float> ends);
-    bool valid() const;
     void dump() const;
     bool subset_check(const vector_t &p) const;
     float len() const;
@@ -120,7 +120,6 @@ public:
     const interval_t& max_edge() const;
 
     triangle_t(const vector_t &p1, const vector_t &p2, const vector_t &p3);
-    bool valid() const;
     void dump() const;
 
     // Get coefficients t of intersection points of line equation.
@@ -134,17 +133,6 @@ public:
     bool is_intersect(const interval_t &ival) const;
     bool is_intersect(const line_t &line) const;
     bool subset_check(const vector_t &p) const;
-
-    // Check if the triangle is degenerated into a interval.
-    // Includes degenerate point case.
-    bool is_special_interval() const;
-
-    // Check if the triangle is degenerated into a point.
-    bool is_special_point() const;
-
-private:
-    bool is_intersect_degenerate(const triangle_t &trgle) const;
-    bool is_intersect_valid(const triangle_t &trgle) const;
 };
 
 } // namespace Triangles3D

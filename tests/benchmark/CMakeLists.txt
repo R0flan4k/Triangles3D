@@ -14,7 +14,7 @@ include_directories(
 )
 
 add_executable(
-	BenchmarkSerialization ${CMAKE_CURRENT_SOURCE_DIR}/benchmark.cpp ${CMAKE_SOURCE_DIR}/Triangles/src/Triangles.cpp)
+	BenchmarkSerialization ${CMAKE_CURRENT_SOURCE_DIR}/benchmark.cpp ${CMAKE_SOURCE_DIR}/Triangles/src/Triangles.cpp ${CMAKE_SOURCE_DIR}/Triangles/src/objects3d.cpp)
 
 target_link_libraries(
 	BenchmarkSerialization PUBLIC ${benchmark_LIBRARIES} benchmark::benchmark_main)

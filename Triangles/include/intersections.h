@@ -1,29 +1,31 @@
 #pragma once
 
 #include "Triangles.h"
+#include "objects3d.h"
 #include "octree.h"
 
-#include <iostream>
-#include <vector>
 #include <cassert>
 #include <cmath>
+#include <iostream>
+#include <memory>
+#include <vector>
 
+using Objects3D::gen_triangle_t;
 using Octree::octree_node_t;
+using Stereometry::interval_t;
 using Stereometry::triangle_t;
 using Stereometry::vector_t;
 
 namespace TrglesIntersections {
 
 struct triangle_unit_t {
-    triangle_t trgle;
+    gen_triangle_t trgle;
     octree_node_t<triangle_unit_t>* ocnode;
     bool is_intersect;
 
     const vector_t &p1() const { return trgle.p1(); }
     const vector_t &p2() const { return trgle.p2(); }
     const vector_t &p3() const { return trgle.p3(); }
-    bool is_special_point() const {return trgle.is_special_point();}
-    bool is_special_interval() const {return trgle.is_special_interval();}
 
     triangle_unit_t(const vector_t &p1, const vector_t &p2, const vector_t &p3,
                     bool is_inter, octree_node_t<triangle_unit_t> &octree)
@@ -53,7 +55,6 @@ public:
             vector_t p[3] = {vector_t{coords[0], coords[1], coords[2]},
                              vector_t{coords[3], coords[4], coords[5]},
                              vector_t{coords[6], coords[7], coords[8]}};
-            assert(p[0].valid() && p[1].valid() && p[2].valid());
             data_.emplace_back(p[0], p[1], p[2], false, octree_);
         }
     }

@@ -11,6 +11,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "-Wall -g -O0 -fsanitize=address -fsanitize=undefined"
 set(SRCS
 	${CMAKE_SOURCE_DIR}/Triangles/src/Triangles.cpp
 	${CMAKE_SOURCE_DIR}/Triangles/src/main.cpp
+	${CMAKE_SOURCE_DIR}/Triangles/src/objects3d.cpp
 )
 add_executable(Triangles.x)
 
