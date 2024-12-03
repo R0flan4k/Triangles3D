@@ -35,7 +35,7 @@ public:
 
 public:
 #ifndef NDEBUG
-    void dump_internal() const override
+    void dump_internal() const
     {
         for (std::size_t i = 0, r = this->rank(); i < r; ++i)
         {

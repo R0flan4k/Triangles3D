@@ -7,6 +7,7 @@
 #include <cassert>
 #include <cmath>
 #include <iostream>
+#include <iterator>
 #include <memory>
 #include <vector>
 
@@ -40,7 +41,7 @@ class octree_trgles_intersect_cntr_t {
     std::vector<triangle_unit_t> data_;
 
 public:
-    template <typename RandomIt>
+    template <std::random_access_iterator RandomIt>
     octree_trgles_intersect_cntr_t(size_t n, float octree_half_size,
                                    RandomIt first, const RandomIt last)
         : octree_(vector_t{0, 0, 0}, octree_half_size, NULL)
