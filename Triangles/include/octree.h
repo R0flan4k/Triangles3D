@@ -3,9 +3,10 @@
 #include "Triangles.h"
 #include "double_comparing.h"
 
-#include <list>
 #include <cassert>
 #include <iostream>
+#include <list>
+#include <memory>
 
 namespace Octree {
 
@@ -15,58 +16,10 @@ using Stereometry::vector_t;
 
 const size_t max_depth = 5;
 
-template <typename ChildT> struct ocnode_children_buff {
-protected:
-    std::array<ChildT *, 8> children;
+template <typename DataT> class octree_node_t final {
+    using ChildT = octree_node_t<DataT>;
 
-    ocnode_children_buff() noexcept
-    {
-        for (size_t i = 0; i < 8; ++i)
-            children[i] = nullptr;
-    }
-
-    virtual ~ocnode_children_buff()
-    {
-        for (size_t i = 0; i < 8; i++)
-            delete children[i];
-    }
-
-    ocnode_children_buff(const ocnode_children_buff &c)
-    {
-        for (size_t i = 0; i < 8; ++i)
-            if (c.children[i])
-                children[i] = new ChildT(c.children[i]);
-    }
-
-    ocnode_children_buff(ocnode_children_buff &&c) noexcept
-    {
-        for (size_t i = 0; i < 8; ++i)
-            std::swap(children[i], c.children[i]);
-    }
-
-    ocnode_children_buff &operator=(const ocnode_children_buff &c)
-    {
-        if (&c == this)
-            return *this;
-        ocnode_children_buff<ChildT> tmp(c);
-        for (size_t i = 0; i < 8; ++i)
-            std::swap(children[i], c.children[i]);
-        return *this;
-    }
-
-    ocnode_children_buff &operator=(ocnode_children_buff &&c) noexcept
-    {
-        if (&c == this)
-            return *this;
-        for (size_t i = 0; i < 8; ++i)
-            std::swap(children[i], c.children[i]);
-        return *this;
-    }
-};
-
-template <typename DataT>
-class octree_node_t final : private ocnode_children_buff<octree_node_t<DataT>> {
-    using ocnode_children_buff<octree_node_t<DataT>>::children;
+    std::array<std::unique_ptr<ChildT>, 8> children_;
     octree_node_t * parent_;       
     std::list<DataT*> data_;
     vector_t center_;
@@ -79,11 +32,13 @@ public:
 
     octree_node_t(vector_t center, float half_size, octree_node_t *parent,
                   size_t depth = 0)
-        : parent_(parent), center_(center), half_size_(half_size), depth_(depth)
+        : children_(), parent_(parent), center_(center), half_size_(half_size),
+          depth_(depth)
     {}
 
     octree_node_t(vector_t center)
-        : parent_(nullptr), center_(center), half_size_(NAN), depth_(0)
+        : children_(), parent_(nullptr), center_(center), half_size_(NAN),
+          depth_(0)
     {}
 
     int get_position(const vector_t &p) const
@@ -115,16 +70,16 @@ public:
         // Check if the triangle placed in child node.
         if (p1_child == p2_child && p2_child == p3_child)
         {
-            if (children[p1_child] == nullptr)
+            if (children_[p1_child] == nullptr)
             {
                 vector_t child_center = {
                     center_.x + half_size_ * (p1_child & 4 ? 0.5f : -0.5f),
                     center_.y + half_size_ * (p1_child & 2 ? 0.5f : -0.5f),
                     center_.z + half_size_ * (p1_child & 1 ? 0.5f : -0.5f)};
-                children[p1_child] = new octree_node_t(
+                children_[p1_child] = std::make_unique<ChildT>(
                     child_center, half_size_ * 0.5f, this, depth_ + 1);
             }
-            return children[p1_child]->insert_trgle(trgle);
+            return children_[p1_child]->insert_trgle(trgle);
         }
 
         data_.push_back(trgle);
@@ -159,10 +114,10 @@ public:
         }
         for (size_t i = 0; i < 8; ++i)
         {
-            if (children[i])
+            if (children_[i] != nullptr)
             {
                 std::cout << "\nChild[" << i << "]:\n";
-                children[i]->dump();
+                children_[i]->dump();
             }
         }
         std::cout << "===========================================" << std::endl;
