@@ -14,8 +14,6 @@ using DblCmp::are_geq;
 using Stereometry::triangle_t;
 using Stereometry::vector_t;
 
-const size_t max_depth = 5;
-
 template <typename DataT> class octree_node_t final {
     using ChildT = octree_node_t<DataT>;
 
@@ -27,18 +25,21 @@ template <typename DataT> class octree_node_t final {
     const size_t depth_;
 
 public:
+    const size_t max_depth;
+
+public:
     octree_node_t* parent() const {return parent_;}
     const std::list<DataT*>& data() const {return data_;}
 
     octree_node_t(vector_t center, float half_size, octree_node_t *parent,
-                  size_t depth = 0)
+                  size_t depth = 0, size_t max_dep = 5)
         : children_(), parent_(parent), center_(center), half_size_(half_size),
-          depth_(depth)
+          depth_(depth), max_depth(max_dep)
     {}
 
-    octree_node_t(vector_t center)
+    octree_node_t(vector_t center, size_t max_dep = 5)
         : children_(), parent_(nullptr), center_(center), half_size_(NAN),
-          depth_(0)
+          depth_(0), max_depth(max_dep)
     {}
 
     int get_position(const vector_t &p) const
