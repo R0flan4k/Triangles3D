@@ -23,7 +23,6 @@ add_executable(
 target_link_libraries(
 	TestSerialization PUBLIC ${GTEST_LIBRARIES} GTest::gtest GTest::gtest_main)
 
-enable_testing()
 add_test(NAME TestSerialization
-	 CONFIGURATIONS unit
          COMMAND "./TestSerialization")
+

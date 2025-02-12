@@ -22,7 +22,5 @@ target_link_libraries(
 SET(GCC_LINK_FLAGS "-lbenchmark -lpthread")
 SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_LINK_FLAGS}")
 
-enable_testing()
 add_test(NAME BenchmarkSerialization
-	 CONFIGURATIONS benchmark
          COMMAND "./BenchmarkSerialization")
