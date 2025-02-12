@@ -4,9 +4,8 @@
 
 cmake_minimum_required(VERSION 3.11)
 project(Triangles3D)
-set(CMAKE_CXX_FLAGS "-O2 -std=c++20")
+set(CMAKE_CXX_STANDART 20)
 set(CMAKE_CXX_FLAGS_DEBUG "-Wall -g -O0 -fsanitize=address -fsanitize=undefined")
-
 
 set(SRCS
 	${CMAKE_SOURCE_DIR}/Triangles/src/Triangles.cpp
