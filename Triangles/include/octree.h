@@ -4,6 +4,7 @@
 #include "double_comparing.h"
 
 #include <cassert>
+#include <concepts>
 #include <iostream>
 #include <list>
 #include <memory>
@@ -14,13 +15,13 @@ using DblCmp::are_geq;
 using Stereometry::triangle_t;
 using Stereometry::vector_t;
 
-template <typename DataT> class octree_node_t final {
-    using ChildT = octree_node_t<DataT>;
+template <typename DataT, std::floating_point T> class octree_node_t final {
+    using ChildT = octree_node_t<DataT, T>;
 
     std::array<std::unique_ptr<ChildT>, 8> children_;
-    octree_node_t * parent_;       
+    octree_node_t<DataT, T> *parent_;
     std::list<DataT*> data_;
-    vector_t center_;
+    vector_t<T> center_;
     float half_size_;
     const size_t depth_;
 
@@ -28,21 +29,22 @@ public:
     const size_t max_depth;
 
 public:
-    octree_node_t* parent() const {return parent_;}
+    octree_node_t<DataT, T> *parent() const { return parent_; }
     const std::list<DataT*>& data() const {return data_;}
 
-    octree_node_t(vector_t center, float half_size, octree_node_t *parent,
-                  size_t depth = 0, size_t max_dep = 5)
+    octree_node_t(vector_t<T> center, float half_size,
+                  octree_node_t<DataT, T> *parent, size_t depth = 0,
+                  size_t max_dep = 5)
         : children_(), parent_(parent), center_(center), half_size_(half_size),
           depth_(depth), max_depth(max_dep)
     {}
 
-    octree_node_t(vector_t center, size_t max_dep = 5)
+    octree_node_t(vector_t<T> center, size_t max_dep = 5)
         : children_(), parent_(nullptr), center_(center), half_size_(NAN),
           depth_(0), max_depth(max_dep)
     {}
 
-    int get_position(const vector_t &p) const
+    int get_position(const vector_t<T> &p) const
     {
         int res = 0;
         if (are_geq(p.x, center_.x))
@@ -54,7 +56,7 @@ public:
         return res;
     }
 
-    octree_node_t* insert_trgle(DataT *trgle)
+    octree_node_t<DataT, T> *insert_trgle(DataT *trgle)
     {
         assert(trgle);
 
@@ -73,7 +75,7 @@ public:
         {
             if (children_[p1_child] == nullptr)
             {
-                vector_t child_center = {
+                vector_t<T> child_center = {
                     center_.x + half_size_ * (p1_child & 4 ? 0.5f : -0.5f),
                     center_.y + half_size_ * (p1_child & 2 ? 0.5f : -0.5f),
                     center_.z + half_size_ * (p1_child & 1 ? 0.5f : -0.5f)};

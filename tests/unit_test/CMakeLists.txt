@@ -13,10 +13,11 @@ set(SRCS
 )
 
 add_executable(
-	TestSerialization ${CMAKE_CURRENT_SOURCE_DIR}/tests.cpp ${CMAKE_SOURCE_DIR}/Triangles/src/Triangles.cpp ${CMAKE_SOURCE_DIR}/Triangles/src/objects3d.cpp)
+	TestSerialization ${CMAKE_CURRENT_SOURCE_DIR}/tests.cpp)
 
 target_include_directories(TestSerialization PUBLIC
 	${CMAKE_SOURCE_DIR}/Triangles/include
+	${CMAKE_SOURCE_DIR}/Triangles/src
 	${CMAKE_SOURCE_DIR}/Matrix/Matrix/include
 	${GTEST_INCLUDE_DIRS}
 )

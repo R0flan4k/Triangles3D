@@ -42,8 +42,8 @@ int main()
     }));
     abs_bound = std::abs(abs_bound) + 1;
 
-    TrglesIntersections::octree_trgles_intersect_cntr_t ts{n, abs_bound, 
-                                                           input.cbegin(), input.cend()};
+    TrglesIntersections::octree_trgles_intersect_cntr_t<float> ts{
+        n, abs_bound, input.cbegin(), input.cend()};
     ts.calculate_intersections();
     ts.intersections_dump();
     return 0;

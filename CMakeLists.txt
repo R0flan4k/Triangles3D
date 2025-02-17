@@ -8,14 +8,14 @@ set(CMAKE_CXX_STANDART 20)
 set(CMAKE_CXX_FLAGS_DEBUG "-Wall -g -O0 -fsanitize=address -fsanitize=undefined")
 
 set(SRCS
-	${CMAKE_SOURCE_DIR}/Triangles/src/Triangles.cpp
+	#	${CMAKE_SOURCE_DIR}/Triangles/src/Triangles.cpp
 	${CMAKE_SOURCE_DIR}/Triangles/src/main.cpp
-	${CMAKE_SOURCE_DIR}/Triangles/src/objects3d.cpp
+	#	${CMAKE_SOURCE_DIR}/Triangles/src/objects3d.cpp
 )
 add_executable(Triangles.x)
 
 target_sources(Triangles.x PRIVATE ${SRCS})
-target_include_directories(Triangles.x PUBLIC "${CMAKE_SOURCE_DIR}/Triangles/include" "${CMAKE_SOURCE_DIR}/Matrix/Matrix/include")
+target_include_directories(Triangles.x PUBLIC "${CMAKE_SOURCE_DIR}/Triangles/include" "${CMAKE_SOURCE_DIR}/Triangles/src"  "${CMAKE_SOURCE_DIR}/Matrix/Matrix/include")
 
 enable_testing()
 add_subdirectory(${CMAKE_SOURCE_DIR}/tests)

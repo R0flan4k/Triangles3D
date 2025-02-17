@@ -9,29 +9,27 @@ using namespace Stereometry;
 
 TEST(Stereometry, AreOnLine)
 {
-    EXPECT_TRUE(are_on_line({-1, -1, -1}, 
-                            {0, 0, 0}, 
-                            {1, 1, 1}));
-    EXPECT_TRUE(are_on_line({1024, -1024, 1024},
-                            {-2048, 2048, -2048},
-                            {1024, -1024, 1024}));
-    EXPECT_TRUE(are_on_line({0, 0, 0},
-                            {0, 0, 0},
-                            {0, 0, 0}));
-    EXPECT_TRUE(are_on_line({1, 8, 4},
-                            {1, 16, 8},
-                            {1, -32, -16}));
-    EXPECT_FALSE(are_on_line({0, 1, -1},
-                             {0, 0, 0},
-                             {0, -1, -1}));
-    EXPECT_FALSE(are_on_line({3214, 765, -11414},
-                             {-31, -32145, 4324},
-                             {990, 4, 2213387}));
+    EXPECT_TRUE(are_on_line(vector_t<float>{-1, -1, -1},
+                            vector_t<float>{0, 0, 0},
+                            vector_t<float>{1, 1, 1}));
+    EXPECT_TRUE(are_on_line(vector_t<float>{1024, -1024, 1024},
+                            vector_t<float>{-2048, 2048, -2048},
+                            vector_t<float>{1024, -1024, 1024}));
+    EXPECT_TRUE(are_on_line(vector_t<float>{0, 0, 0}, vector_t<float>{0, 0, 0},
+                            vector_t<float>{0, 0, 0}));
+    EXPECT_TRUE(are_on_line(vector_t<float>{1, 8, 4}, vector_t<float>{1, 16, 8},
+                            vector_t<float>{1, -32, -16}));
+    EXPECT_FALSE(are_on_line(vector_t<float>{0, 1, -1},
+                             vector_t<float>{0, 0, 0},
+                             vector_t<float>{0, -1, -1}));
+    EXPECT_FALSE(are_on_line(vector_t<float>{3214, 765, -11414},
+                             vector_t<float>{-31, -32145, 4324},
+                             vector_t<float>{990, 4, 2213387}));
 }
 
 TEST(Plane, DegeneratePlanes)
 {
-    plane_t pln1{{1, 0, 0}, {-4, 2, 0}, {-1, -1, 0}};
+    plane_t<float> pln1{{1, 0, 0}, {-4, 2, 0}, {-1, -1, 0}};
 
     EXPECT_EQ(pln1.a, 0);
     EXPECT_EQ(pln1.b, 0);
@@ -41,32 +39,33 @@ TEST(Plane, DegeneratePlanes)
 
 TEST(Plane, SubsetCheck)
 {
-    plane_t pln1{{1, 0, 0}, {-4, 2, 0}, {-1, -1, 0}};
+    plane_t<float> pln1{{1, 0, 0}, {-4, 2, 0}, {-1, -1, 0}};
 
-    EXPECT_TRUE(pln1.subset_check(vector_t{0, 0, 0}));
-    EXPECT_TRUE(pln1.subset_check(vector_t{-41241, 1231, 0}));
+    EXPECT_TRUE(pln1.subset_check(vector_t<float>{0, 0, 0}));
+    EXPECT_TRUE(pln1.subset_check(vector_t<float>{-41241, 1231, 0}));
 }
 
 TEST(Line, DegenerateLines)
 {
-    plane_t pln1{0, 0, 1, 0},
-            pln2{1, 0, 0, 0};
-    line_t line12{pln1, pln2}, line3{{vector_t{1, 0, 0}, vector_t{-100, 0, 0}}};
+    plane_t<float> pln1{0, 0, 1, 0}, pln2{1, 0, 0, 0};
+    line_t<float> line12{pln1, pln2},
+        line3{{vector_t<float>{1, 0, 0}, vector_t<float>{-100, 0, 0}}};
 
-    EXPECT_TRUE(are_collinear_vect(line12.a, vector_t{0, 1, 0}));
-    EXPECT_TRUE(are_collinear_vect(line3.a, vector_t{1, 0, 0}));
+    EXPECT_TRUE(are_collinear_vect(line12.a, vector_t<float>{0, 1, 0}));
+    EXPECT_TRUE(are_collinear_vect(line3.a, vector_t<float>{1, 0, 0}));
 }
 
 TEST(Line, GetIntersection)
 {
-    line_t line1{{vector_t{1, 1, 1}, vector_t{2, 2, 2}}},
-        line2{{vector_t{-1, 1, 1}, vector_t{-2, 2, 2}}},
-        line3{{vector_t{0, 0, 0}, vector_t{1, 1, 1}}},
-        line4{{vector_t{2, 2, 2}, vector_t{3, 3, 3}}};
+    line_t<float> line1{{vector_t<float>{1, 1, 1}, vector_t<float>{2, 2, 2}}},
+        line2{{vector_t<float>{-1, 1, 1}, vector_t<float>{-2, 2, 2}}},
+        line3{{vector_t<float>{0, 0, 0}, vector_t<float>{1, 1, 1}}},
+        line4{{vector_t<float>{2, 2, 2}, vector_t<float>{3, 3, 3}}};
 
     float inter34 = line3.get_intersection(line4),
           inter12 = line1.get_intersection(line2);
-    vector_t pinter12 = line1.r0 + inter12 * line1.a, res12 = vector_t{0, 0, 0};
+    vector_t<float> pinter12 = line1.r0 + inter12 * line1.a,
+                    res12 = vector_t<float>{0, 0, 0};
 
     EXPECT_EQ(pinter12, res12);
     EXPECT_TRUE(inter34 != inter34);
@@ -74,7 +73,7 @@ TEST(Line, GetIntersection)
 
 TEST(Triangle, IsIntersect)
 {
-    gen_triangle_t t1{{0, 0, 0}, {1, 1, 1}, {0, 1, 1}},
+    gen_triangle_t<float> t1{{0, 0, 0}, {1, 1, 1}, {0, 1, 1}},
         t2{{1, 1, 0}, {-1, 1, 0}, {0, -1, 0}},
         t3{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}},
         t4{{1, 0, 0}, {0, 1, 0}, {0, -1, 0}},
@@ -157,21 +156,21 @@ TEST(Triangle, IsIntersect)
 
 TEST(Interval, SubsetCheck)
 {
-    interval_t i1{{vector_t{0, 0, 0}, vector_t{10, 0, 0}}},
-        i2{{vector_t{-1, -1, -1}, vector_t{1, 1, 1}}};
+    interval_t<float> i1{{vector_t<float>{0, 0, 0}, vector_t<float>{10, 0, 0}}},
+        i2{{vector_t<float>{-1, -1, -1}, vector_t<float>{1, 1, 1}}};
 
-    EXPECT_TRUE(i1.subset_check(vector_t{5, 0, 0}));
-    EXPECT_TRUE(i2.subset_check(vector_t{0, 0, 0}));
-    EXPECT_FALSE(i2.subset_check(vector_t{2, 2, 2}));
+    EXPECT_TRUE(i1.subset_check(vector_t<float>{5, 0, 0}));
+    EXPECT_TRUE(i2.subset_check(vector_t<float>{0, 0, 0}));
+    EXPECT_FALSE(i2.subset_check(vector_t<float>{2, 2, 2}));
 }
 
 TEST(Triangle, SubsetCheck)
 {
-    triangle_t t1{{0, 0, 0}, {1, 1, 1}, {0, 1, 1}},
-               t2{{1, 1, 1}, {1, 2, 2}, {0, 0, 0}};
+    triangle_t<float> t1{{0, 0, 0}, {1, 1, 1}, {0, 1, 1}},
+        t2{{1, 1, 1}, {1, 2, 2}, {0, 0, 0}};
 
-    EXPECT_TRUE(t1.subset_check(vector_t{0, 0, 0}));
-    EXPECT_FALSE(t2.subset_check(vector_t{2, 2, 2}));
+    EXPECT_TRUE(t1.subset_check(vector_t<float>{0, 0, 0}));
+    EXPECT_FALSE(t2.subset_check(vector_t<float>{2, 2, 2}));
 }
 
 TEST(TrglesIntersections, OctreeIntersectionsCntr)
@@ -203,8 +202,8 @@ TEST(TrglesIntersections, OctreeIntersectionsCntr)
            2,  2, 0, 2, 2, 3, 2, 2, 3, 2, 1, 0, 1, 1, 3, -3, 1, -1},
         i9{1, 0, 0, 0,  1,   0, 0, 0, 1, 0, 0, 0, 5,  5,
            0, 5, 5, 10, 0.5, 0, 0, 0, 0, 0, 0, 0, 0.5};
-    TrglesIntersections::octree_trgles_intersect_cntr_t ts1{3, 6, i1.cbegin(),
-                                                            i1.cend()},
+    TrglesIntersections::octree_trgles_intersect_cntr_t<float> ts1{
+        3, 6, i1.cbegin(), i1.cend()},
         ts2{8, 11, i2.cbegin(), i2.cend()}, ts3{12, 10, i3.cbegin(), i3.cend()},
         ts4{8, 3, i4.cbegin(), i4.cend()}, ts5{4, 3, i5.cbegin(), i5.cend()},
         ts6{4, 4, i6.cbegin(), i6.cend()}, ts7{5, 4, i7.cbegin(), i7.cend()},

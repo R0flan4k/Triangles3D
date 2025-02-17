@@ -8,10 +8,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 
 add_executable(
-	BenchmarkSerialization ${CMAKE_CURRENT_SOURCE_DIR}/benchmark.cpp ${CMAKE_SOURCE_DIR}/Triangles/src/Triangles.cpp ${CMAKE_SOURCE_DIR}/Triangles/src/objects3d.cpp)
+	BenchmarkSerialization ${CMAKE_CURRENT_SOURCE_DIR}/benchmark.cpp)
 
 target_include_directories(BenchmarkSerialization PUBLIC
 	${CMAKE_SOURCE_DIR}/Triangles/include
+	${CMAKE_SOURCE_DIR}/Triangles/src
 	${CMAKE_SOURCE_DIR}/Matrix/Matrix/include
 	${benchmark_INCLUDE_DIRS}
 )

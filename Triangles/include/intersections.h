@@ -6,6 +6,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <concepts>
 #include <iostream>
 #include <iterator>
 #include <memory>
@@ -19,43 +20,44 @@ using Stereometry::vector_t;
 
 namespace TrglesIntersections {
 
-struct triangle_unit_t {
-    gen_triangle_t trgle;
-    octree_node_t<triangle_unit_t>* ocnode;
+template <std::floating_point T> struct triangle_unit_t {
+    gen_triangle_t<T> trgle;
+    octree_node_t<triangle_unit_t<T>, T> *ocnode;
     bool is_intersect;
 
-    const vector_t &p1() const { return trgle.p1(); }
-    const vector_t &p2() const { return trgle.p2(); }
-    const vector_t &p3() const { return trgle.p3(); }
+    const vector_t<T> &p1() const { return trgle.p1(); }
+    const vector_t<T> &p2() const { return trgle.p2(); }
+    const vector_t<T> &p3() const { return trgle.p3(); }
 
-    triangle_unit_t(const vector_t &p1, const vector_t &p2, const vector_t &p3,
-                    bool is_inter, octree_node_t<triangle_unit_t> &octree)
+    triangle_unit_t(const vector_t<T> &p1, const vector_t<T> &p2,
+                    const vector_t<T> &p3, bool is_inter,
+                    octree_node_t<triangle_unit_t<T>, T> &octree)
         : trgle(p1, p2, p3), ocnode(octree.insert_trgle(this)),
           is_intersect(is_inter)
     {}
 };
 
-class octree_trgles_intersect_cntr_t {
-    using NodeT = octree_node_t<triangle_unit_t>;
+template <std::floating_point T> class octree_trgles_intersect_cntr_t {
+    using NodeT = octree_node_t<triangle_unit_t<T>, T>;
     NodeT octree_;
-    std::vector<triangle_unit_t> data_;
+    std::vector<triangle_unit_t<T>> data_;
 
 public:
     template <std::random_access_iterator RandomIt>
     octree_trgles_intersect_cntr_t(size_t n, float octree_half_size,
                                    RandomIt first, const RandomIt last)
-        : octree_(vector_t{0, 0, 0}, octree_half_size, NULL)
+        : octree_(vector_t<T>{0, 0, 0}, octree_half_size, NULL)
     {
         data_.reserve(n);
         for (; first != last;)
         {
-            float coords[9];
+            T coords[9];
             auto point_end = std::next(first, 9);
             std::copy(first, point_end, coords);
             first = point_end;
-            vector_t p[3] = {vector_t{coords[0], coords[1], coords[2]},
-                             vector_t{coords[3], coords[4], coords[5]},
-                             vector_t{coords[6], coords[7], coords[8]}};
+            vector_t<T> p[3] = {vector_t<T>{coords[0], coords[1], coords[2]},
+                                vector_t<T>{coords[3], coords[4], coords[5]},
+                                vector_t<T>{coords[6], coords[7], coords[8]}};
             data_.emplace_back(p[0], p[1], p[2], false, octree_);
         }
     }
@@ -94,8 +96,7 @@ public:
     }
 
 private:
-    size_t node_check_intersection(triangle_unit_t &trgle,
-                                   NodeT &ocnode)
+    size_t node_check_intersection(triangle_unit_t<T> &trgle, NodeT &ocnode)
     {
         size_t inters_cnt = 0;
         for (auto start = ocnode.data().begin(), end = ocnode.data().end();
@@ -125,5 +126,4 @@ private:
         return inters_cnt;
     }
 };
-
 }
