@@ -174,8 +174,8 @@ Stereometry::plane_t<T>::is_parallel_equal(const plane_t<T> &pln) const
 }
 
 template <std::floating_point T>
-static std::pair<T, T>
-calculate_linear2d(const Matrices::const_matrix_t<T> &matr, T f1, T f2)
+static std::pair<T, T> calculate_linear2d(const Matrices::matrix_t<T> &matr,
+                                          T f1, T f2)
 {
     LinearSystems::linear_system_t<T> ls(matr, {f1, f2});
     auto solve = ls.calculate_linear();
@@ -187,7 +187,7 @@ template <std::floating_point T>
 Stereometry::vector_t<T>
 Stereometry::plane_t<T>::get_common_point(const plane_t<T> &pln) const
 {
-    Matrices::const_matrix_t<T> system_matr{b, c, pln.b, pln.c};
+    const Matrices::matrix_t<T> system_matr{b, c, pln.b, pln.c};
     if (is_zero(system_matr.calculate_det()))
         return degenerate_get_common_point(pln);
 
@@ -329,19 +329,21 @@ T Stereometry::line_t<T>::get_intersection(const line_t<T> &line) const
 {
     {
         assert(is_intersect(line));
-        Matrices::const_matrix_t<double> sys_matr{a.x, -line.a.x, a.y,
+        const Matrices::matrix_t<double> sys_matr{a.x, -line.a.x, a.y,
                                                   -line.a.y},
             matr1{line.r0.x - r0.x, -line.a.x, line.r0.y - r0.y, -line.a.y};
-        if (!is_zero(sys_matr.calculate_det()))
-            return matr1.calculate_det() / sys_matr.det();
+        double sys_matr_det = sys_matr.calculate_det();
+        if (!is_zero(sys_matr_det))
+            return matr1.calculate_det() / sys_matr_det;
 
-        Matrices::const_matrix_t<double> alt_sys_matr{a.y, -line.a.y, a.z,
+        const Matrices::matrix_t<double> alt_sys_matr{a.y, -line.a.y, a.z,
                                                       -line.a.z},
             alt_matr1{line.r0.y - r0.y, -line.a.y, line.r0.z - r0.z, -line.a.z};
-        if (!is_zero(alt_sys_matr.calculate_det()))
-            return alt_matr1.calculate_det() / alt_sys_matr.det();
+        double alt_sys_matr_det = alt_sys_matr.calculate_det();
+        if (!is_zero(alt_sys_matr_det))
+            return alt_matr1.calculate_det() / alt_sys_matr_det;
 
-        Matrices::const_matrix_t<double> fin_sys_matr{a.z, -line.a.z, a.x,
+        const Matrices::matrix_t<double> fin_sys_matr{a.z, -line.a.z, a.x,
                                                       -line.a.x},
             fin_matr1{line.r0.z - r0.z, -line.a.z, line.r0.x - r0.x, -line.a.x};
         return fin_matr1.calculate_det() / fin_sys_matr.calculate_det();
