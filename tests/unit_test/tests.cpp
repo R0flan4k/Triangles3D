@@ -232,7 +232,8 @@ TEST(TrglesIntersections, OctreeIntersectionsCntr)
 TEST(LinearSystems, Solving)
 {
     LinearSystems::linear_system_t<double> ls({2, 1, 1, 5}, {4, 0});
-    auto solve_it = ls.calculate_linear();
-    EXPECT_EQ(*(solve_it.first++), 20.d / 9);
-    EXPECT_EQ(*(solve_it.first++), -4.d / 9);
+    auto solve = ls.calculate_linear();
+    auto solve_it = solve->cbegin();
+    EXPECT_EQ(*(solve_it++), 20.d / 9);
+    EXPECT_EQ(*(solve_it++), -4.d / 9);
 }

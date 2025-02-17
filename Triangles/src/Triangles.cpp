@@ -178,8 +178,9 @@ static std::pair<T, T>
 calculate_linear2d(const Matrices::const_matrix_t<T> &matr, T f1, T f2)
 {
     LinearSystems::linear_system_t<T> ls(matr, {f1, f2});
-    auto solve_it = ls.calculate_linear();
-    return std::make_pair(*(solve_it.first++), *(solve_it.first++));
+    auto solve = ls.calculate_linear();
+    auto solve_it = solve->cbegin();
+    return std::make_pair(*(solve_it++), *(solve_it++));
 }
 
 template <std::floating_point T>
