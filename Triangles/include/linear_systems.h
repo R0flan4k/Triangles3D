@@ -69,9 +69,7 @@ private:
 public:
     std::unique_ptr<std::vector<T>> calculate_linear() const
     {
-        this->calculate_det();
-        std::unique_ptr<std::vector<T>> solve = cramers_rule_calc();
-        return solve;
+        return cramers_rule_calc();
     }
 };
 
